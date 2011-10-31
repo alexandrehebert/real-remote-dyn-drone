@@ -1,27 +1,46 @@
 package fr.upmc.r2d2.tools;
 
+import fr.upmc.dtgui.annotations.BooleanSensorData;
+import fr.upmc.dtgui.annotations.RealSensorData;
 import java.lang.annotation.Annotation;
 
 /**
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
-public class SensorData {
+public class SensorData<T, A extends Annotation> {
     
-    private Object value;
-    private Annotation a;
+    private T value;
+    private A a;
     
-    public SensorData(Object value, Annotation a) {
+    public SensorData(T value, A a) {
         this.value = value;
         this.a = a;
     }
     
-    public Object getValue() {
+    public T getValue() {
         return value;
     }
     
-    public Annotation getAnnotation() {
+    public A getAnnotation() {
         return a;
     }
     
+    public static class RealSensorCapsule extends SensorData<Double, RealSensorData> {
+
+        public RealSensorCapsule(Double v, RealSensorData d) {
+            super(v, d);
+        }
+
+    }
+    
+    public static class BooleanSensorCapsule extends SensorData<Boolean, BooleanSensorData> {
+
+        public BooleanSensorCapsule(Boolean v, BooleanSensorData d) {
+            super(v, d);
+        }
+
+    }
+    
 }
+

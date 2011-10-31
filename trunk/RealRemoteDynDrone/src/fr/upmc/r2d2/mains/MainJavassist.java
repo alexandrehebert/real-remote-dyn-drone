@@ -10,6 +10,9 @@ import fr.upmc.dtgui.annotations.WithActuators;
 import fr.upmc.dtgui.annotations.WithSensors;
 import fr.upmc.r2d2.tools.AssistantLoader;
 import fr.upmc.r2d2.tools.Utils;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -36,9 +39,9 @@ public class MainJavassist {
     private static final AssistantLoader LOADER = new AssistantLoader();
 
     public static void main(String[] args) throws Throwable {
-//        LOADER.addTranslator(new RobotWithSensorsTranslator(), "@fr.upmc.dtgui.annotations.WithSensors");
+        LOADER.addTranslator(new RobotTranslator(), "@fr.upmc.dtgui.annotations.WithSensors");
 //        LOADER.addTranslator(new RobotWithActuatorsTranslator(), "@fr.upmc.dtgui.annotations.WithActuators");
-        LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
+        // LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
         LOADER.addTranslator(new WorldTranslator(), "fr.upmc.r2d2.tests.World");
         LOADER.run("fr.upmc.r2d2.tests.WorldTests", new String[]{Boolean.toString(SHOW_UI)});
         //l.run("fr.upmc.r2d2.mains.MainTests");
@@ -49,6 +52,10 @@ public class MainJavassist {
         @Override
         public void onLoad(ClassPool cp, String string, final CtClass cc) throws Exception {
             
+            System.out.println("-------------------------------------------------");
+            System.out.println("|\t" + cc.getSimpleName());
+            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - -");
+            
             final Makeable maker = (Makeable) Proxy.newProxyInstance(
                     RobotMaker.class.getClassLoader(), 
                     new Class[] {Makeable.class}, 
@@ -57,11 +64,13 @@ public class MainJavassist {
             WALKER.walk(cc, new WalkAnnotations.IAnnotationWalker() {
                 @Override
                 public void walk(CtMethod m, Annotation a) throws Exception {
-                     maker.addSensor(m, m.getName().substring(3), a);
+                     maker.processAnnotation(m, m.getName().substring(3), a);
                 }
             });
             
             maker.make();
+            System.out.println("-------------------------------------------------");
+            System.out.println();
             
         }
     }
@@ -73,9 +82,6 @@ public class MainJavassist {
         }
 
         public void walk(CtClass c, IAnnotationWalker walker) {
-            System.out.println("-------------------------------------------------");
-            System.out.println("|\t" + c.getSimpleName());
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - -");
             for (CtMethod method : c.getMethods()) {
                 try {
                     for (Object o : method.getAnnotations()) {
@@ -89,14 +95,12 @@ public class MainJavassist {
                     Utils.print(e);
                 }
             }
-            System.out.println("-------------------------------------------------");
-            System.out.println();
         }
     }
     
     public static interface Makeable extends InvocationHandler {
         public void make() throws Exception;
-        public void addSensor(CtMethod m, String name, Annotation sensor) throws Exception;
+        public void processAnnotation(CtMethod m, String name, Annotation sensor) throws Exception;
     }
     
     public static class RobotMaker implements Makeable {
@@ -123,41 +127,59 @@ public class MainJavassist {
         }
         
         @Override        
-        public void addSensor(CtMethod m, String name, Annotation sensor) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+        public void processAnnotation(CtMethod m, String name, Annotation sensor) throws Exception {
             Method addSensor;
             
             try {
                 addSensor = getClass()
-                .getMethod("addSensor", CtMethod.class, String.class, sensor.annotationType());
-            } catch (Throwable ex) { return; }
+                .getMethod("processAnnotation", CtMethod.class, String.class, sensor.annotationType());
+            } catch (Throwable ex) { return; } // si on ne trouve pas la méthode tant pis, pas besoin de faire remonter d'exception
             
             addSensor.invoke(this, m, name, sensor); 
             sensors.add(sensor);
         }
 
-        public void addSensor(CtMethod m, String name, RealSensorData sensor) {
+        public void processAnnotation(CtMethod m, String name, RealSensorData sensor) {
             // pas tout à fait juste, ne fonctionne pas avec les sensors X & Y
             // provisoire :
             //if (name.equals("SteeringAngle")) name = "Steering";
-            tmpQueue.append(("dataQueue.add(new Double(robot.get" + name + "()));"));
+            final StringBuffer s = new StringBuffer();
+            try {
+            ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+                    s.append((char)b);
+                }
+            });
+                oos.writeObject(sensor);
+                oos.close();
+            } catch (Exception e) {
+            } finally {
+                System.out.println(s.toString());
+            }
+            tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.SensorData.RealSensorCapsule(new Double(robot.get" + name + "()), ));"));
 
         }
         
-        public void addSensor(CtMethod m, String name, BooleanSensorData sensor) {
+        public void processAnnotation(CtMethod m, String name, BooleanSensorData sensor) {
             // pas tout à fait juste, ne fonctionne pas avec les sensors X & Y
             // provisoire :
             //if (name.equals("SteeringAngle")) name = "Steering";
-            tmpQueue.append(("dataQueue.add(new Boolean(robot.get" + name + "()));"));
-        }        
+            // tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.SensorData.BooleanSensorCapsule(new Boolean(robot.get" + name + "()), sensor));"));
+        }
         
         @Override
         public void make() throws Exception {
-            if (robot.hasAnnotation(WithSensors.class))
+            if (robot.hasAnnotation(WithSensors.class)) {
+                System.out.println("> begin makeSensors");
                 makeSensors();
-            
-            if (robot.hasAnnotation(WithActuators.class))
-                makeActuators();            
-            
+                System.out.println("< end");
+            }
+            if (robot.hasAnnotation(WithActuators.class)) {
+                System.out.println("> begin makeActuators");
+                makeActuators();        
+                System.out.println("< end");    
+            }
             makeRobot();
         }
         
@@ -209,7 +231,7 @@ public class MainJavassist {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getName().equals("make"))
-                System.out.println("makin...");
+                System.out.println("makin " + robot.getName() + "...");
             return method.invoke(this, args);
         }
         
@@ -219,7 +241,7 @@ public class MainJavassist {
         
         @Override
         public void onLoad(ClassPool cp, String string, CtClass c) throws Exception {
-            System.out.println("blaaaah");
+            System.out.println("Make The World !!!");
         }
     }
     
