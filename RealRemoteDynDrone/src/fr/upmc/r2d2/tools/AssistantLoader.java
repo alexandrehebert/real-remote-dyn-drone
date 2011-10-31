@@ -136,12 +136,9 @@ public class AssistantLoader extends Loader {
                 t.onLoad(cp, string, getCtClass(cp, string));
             }
             catch (Throwable e) {
-                System.out.println("blah");
                 Utils.print(e);
             }
-            finally {
-                // t.onLoad(cp, string, null); risque de recursion
-            }
+            // finally {t.onLoad(cp, string, null);} // risque de recursion
         }
         
     }
@@ -183,10 +180,10 @@ public class AssistantLoader extends Loader {
         private boolean isImplement(ClassPool cp, String string, List<String> classzs) throws NotFoundException {
             CtClass c = getCtClass(cp, string);
             
-            for(CtClass inter : c.getInterfaces()) {
-                if (classzs.contains(inter.getName())) 
-                    return true;
-            }
+            if (!c.isInterface())
+                for(CtClass inter : c.getInterfaces())
+                    if (classzs.contains(inter.getName())) 
+                        return true;
 
             return false;
         }
