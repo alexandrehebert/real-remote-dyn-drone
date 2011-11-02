@@ -35,7 +35,6 @@ import javassist.CtMethod;
 public class MainJavassist {
 
     private static final WalkAnnotations WALKER = new WalkAnnotations();
-    private static final boolean SHOW_UI = false;
     private static final AssistantLoader LOADER = new AssistantLoader();
 
     public static void main(String[] args) throws Throwable {
@@ -43,10 +42,9 @@ public class MainJavassist {
 //        LOADER.addTranslator(new RobotWithActuatorsTranslator(), "@fr.upmc.dtgui.annotations.WithActuators");
         // LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
         LOADER.addTranslator(new WorldTranslator(), "fr.upmc.r2d2.tests.World");
-        //LOADER.run("fr.upmc.r2d2.tests.WorldTests", new String[]{Boolean.toString(SHOW_UI)});
         LOADER.run("fr.upmc.r2d2.mains.MainTests");
     }
-
+    
     private static class RobotTranslator implements AssistantLoader.ISimpleTranslator {
 
         @Override
@@ -228,7 +226,7 @@ public class MainJavassist {
         
         @Override
         public void onLoad(ClassPool cp, String string, CtClass c) throws Exception {
-            System.out.println("Make The World !!!");
+            System.out.println(">>> Make The World !!!");
         }
     }
     
