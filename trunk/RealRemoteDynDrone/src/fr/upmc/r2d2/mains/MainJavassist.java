@@ -43,8 +43,8 @@ public class MainJavassist {
 //        LOADER.addTranslator(new RobotWithActuatorsTranslator(), "@fr.upmc.dtgui.annotations.WithActuators");
         // LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
         LOADER.addTranslator(new WorldTranslator(), "fr.upmc.r2d2.tests.World");
-        LOADER.run("fr.upmc.r2d2.tests.WorldTests", new String[]{Boolean.toString(SHOW_UI)});
-        //l.run("fr.upmc.r2d2.mains.MainTests");
+        //LOADER.run("fr.upmc.r2d2.tests.WorldTests", new String[]{Boolean.toString(SHOW_UI)});
+        LOADER.run("fr.upmc.r2d2.mains.MainTests");
     }
 
     private static class RobotTranslator implements AssistantLoader.ISimpleTranslator {
@@ -135,6 +135,7 @@ public class MainJavassist {
                 .getMethod("processAnnotation", CtMethod.class, String.class, sensor.annotationType());
             } catch (Throwable ex) { return; } // si on ne trouve pas la méthode tant pis, pas besoin de faire remonter d'exception
             
+            System.out.println("var " + name);
             addSensor.invoke(this, m, name, sensor); 
             sensors.add(sensor);
         }
@@ -143,21 +144,7 @@ public class MainJavassist {
             // pas tout à fait juste, ne fonctionne pas avec les sensors X & Y
             // provisoire :
             //if (name.equals("SteeringAngle")) name = "Steering";
-            final StringBuffer s = new StringBuffer();
-            try {
-            ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
-                @Override
-                public void write(int b) throws IOException {
-                    s.append((char)b);
-                }
-            });
-                oos.writeObject(sensor);
-                oos.close();
-            } catch (Exception e) {
-            } finally {
-                System.out.println(s.toString());
-            }
-            tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.SensorData.RealSensorCapsule(new Double(robot.get" + name + "()), ));"));
+            tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.SensorData.RealSensorCapsule(new Double(robot.get" + name + "()), null));"));
 
         }
         
@@ -231,7 +218,7 @@ public class MainJavassist {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getName().equals("make"))
-                System.out.println("makin " + robot.getName() + "...");
+                System.out.println("| make " + robot.getName() + "...");
             return method.invoke(this, args);
         }
         

@@ -9,7 +9,9 @@
                 <root id="src.src.dir"/>
                 <root id="src.Sources.dir" name="../Sources"/>
             </source-roots>
-            <test-roots/>
+            <test-roots>
+                <root id="test.tests.dir"/>
+            </test-roots>
         </data>
     </configuration>
 </project>
