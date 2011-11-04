@@ -1,9 +1,9 @@
 public void run() {
+    RobotActuatorCommand rac = null;
     while (true) {
-        dataQueue.clear();
-        #TMPQUEUE#
         try {
-            Thread.sleep((long)sleep);
+            rac = this.commandQueue.take();
+            rac.performOn(lr);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
