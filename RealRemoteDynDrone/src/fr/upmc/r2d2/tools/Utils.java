@@ -47,22 +47,23 @@ public class Utils {
             InputStreamReader ipsr = new InputStreamReader(ips);
             BufferedReader br = new BufferedReader(ipsr);
             String line;
-            while ((line = br.readLine()) != null)
+            while ((line = br.readLine()) != null) {
                 file += line;
+            }
             br.close();
         } catch (Exception e) {
             Utils.print(e);
         }
         return file;
     }
-    
-    public String serialize(Object o) {
+
+    public static String serialize(Object o) {
         final StringBuffer s = new StringBuffer();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
                 @Override
                 public void write(int b) throws IOException {
-                    s.append((char)b);
+                    s.append((char) b);
                 }
             });
             oos.writeObject(o);
@@ -71,6 +72,25 @@ public class Utils {
         } finally {
             return s.toString();
         }
+    }
+    
+    public static void block(String name, Block b) throws Exception {
+        System.out.println("-------------------------------------------------");
+        System.out.println("|\t" + whiteSpacesCompletion(name, 40) + "|");
+        System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - -");
+        b.run();
+        System.out.println("-------------------------------------------------");
+        System.out.println();
+    }
+    
+    public static String whiteSpacesCompletion(String v, int size) {
+        if (v.length() == size) return v;
+        if (v.length() > size) return v.substring(0, size - 3) + "...";
+        return whiteSpacesCompletion(v + " ", size);
+    }
+    
+    public static interface Block /*extends Runnable*/ {
+        void run() throws Exception;
     }
     
 }

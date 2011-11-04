@@ -1,27 +1,17 @@
 package fr.upmc.r2d2.mains;
 
-import fr.upmc.dtgui.annotations.BooleanActuatorData;
 import fr.upmc.dtgui.annotations.BooleanSensorData;
-import fr.upmc.dtgui.annotations.IntegerActuatorData;
-import fr.upmc.dtgui.annotations.IntegerSensorData;
-import fr.upmc.dtgui.annotations.RealActuatorData;
 import fr.upmc.dtgui.annotations.RealSensorData;
 import fr.upmc.dtgui.annotations.WithActuators;
 import fr.upmc.dtgui.annotations.WithSensors;
 import fr.upmc.r2d2.tools.AssistantLoader;
 import fr.upmc.r2d2.tools.Utils;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -32,7 +22,7 @@ import javassist.CtMethod;
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
-public class MainJavassist {
+public class MainJavassist_1 {
 
     private static final WalkAnnotations WALKER = new WalkAnnotations();
     private static final AssistantLoader LOADER = new AssistantLoader();
@@ -41,8 +31,9 @@ public class MainJavassist {
         LOADER.addTranslator(new RobotTranslator(), "@fr.upmc.dtgui.annotations.WithSensors");
 //        LOADER.addTranslator(new RobotWithActuatorsTranslator(), "@fr.upmc.dtgui.annotations.WithActuators");
         // LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
-        LOADER.addTranslator(new WorldTranslator(), "fr.upmc.r2d2.tests.World");
-        LOADER.run("fr.upmc.r2d2.mains.MainTests");
+        LOADER.addTranslator(new WorldTranslator(), "fr.upmc.dtgui.example.World");
+        LOADER.run("fr.upmc.r2d2.tests.MainTests");
+        //LOADER.run("fr.upmc.dtgui.example.WorldTests");
     }
     
     private static class RobotTranslator implements AssistantLoader.ISimpleTranslator {
@@ -50,25 +41,26 @@ public class MainJavassist {
         @Override
         public void onLoad(ClassPool cp, String string, final CtClass cc) throws Exception {
             
-            System.out.println("-------------------------------------------------");
-            System.out.println("|\t" + cc.getSimpleName());
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - -");
-            
-            final Makeable maker = (Makeable) Proxy.newProxyInstance(
-                    RobotMaker.class.getClassLoader(), 
-                    new Class[] {Makeable.class}, 
-                    new RobotMaker(cc));
-            
-            WALKER.walk(cc, new WalkAnnotations.IAnnotationWalker() {
+            Utils.block(cc.getSimpleName(), new Utils.Block() {
+
                 @Override
-                public void walk(CtMethod m, Annotation a) throws Exception {
-                     maker.processAnnotation(m, m.getName().substring(3), a);
+                public void run() throws Exception {
+                    final Makeable maker = (Makeable) Proxy.newProxyInstance(
+                            RobotMaker.class.getClassLoader(), 
+                            new Class[] {Makeable.class}, 
+                            new RobotMaker(cc));
+
+                    WALKER.walk(cc, new WalkAnnotations.IAnnotationWalker() {
+                        @Override
+                        public void walk(CtMethod m, Annotation a) throws Exception {
+                             maker.processAnnotation(m, m.getName().substring(3), a);
+                        }
+                    });
+
+                    maker.make();
                 }
+                
             });
-            
-            maker.make();
-            System.out.println("-------------------------------------------------");
-            System.out.println();
             
         }
     }
@@ -169,6 +161,7 @@ public class MainJavassist {
         }
         
         public void makeSensors() throws Exception {
+            
             // création de la ctclass
             dataSender = pool.makeClass(
                     // getName doit retourner le nom complet de la classe + package
@@ -178,6 +171,7 @@ public class MainJavassist {
             // ajout des champs 
             dataSender.addField(CtField.make("public final BlockingQueue dataQueue = new ArrayBlockingQueue(" + sensors.size() + ");", dataSender));
             dataSender.addField(CtField.make("private " + robot.getName() + " robot;", dataSender));
+            dataSender.addField(CtField.make("private int sleep = 100;", dataSender));
             
             // construction du code des méthodes et constructeurs
             run = run.replaceFirst("#TMPQUEUE#", tmpQueue.toString());

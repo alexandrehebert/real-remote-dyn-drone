@@ -177,13 +177,18 @@ public class AssistantLoader extends Loader {
             return false;
         }
         
-        private boolean isImplement(ClassPool cp, String string, List<String> classzs) throws NotFoundException {
+        private boolean isImplement(ClassPool cp, String string, List<String> classzs) {
             CtClass c = getCtClass(cp, string);
             
-            if (!c.isInterface())
-                for(CtClass inter : c.getInterfaces())
-                    if (classzs.contains(inter.getName())) 
-                        return true;
+            try {
+                if (!c.isInterface())
+                    for(CtClass inter : c.getInterfaces())
+                        if (classzs.contains(inter.getName())) 
+                            return true;
+            }
+            catch (NotFoundException e) {
+                Utils.print(e);
+            }
 
             return false;
         }
