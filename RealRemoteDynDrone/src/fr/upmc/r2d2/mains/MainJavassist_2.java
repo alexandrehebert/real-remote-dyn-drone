@@ -37,8 +37,22 @@ public class MainJavassist_2 {
         //LOADER.run("fr.upmc.r2d2.tests.MainTests");
     }
     
+    /**
+     * Parcours des classes annotées au minimum par WithSensors,
+     * donc, typiquement : les robots
+     * RobotTranslator ne sera prévenu que du chargement de ces classes,
+     * et d'aucunes autres
+     */
     private static class RobotTranslator implements AssistantLoader.ISimpleTranslator {
 
+        /**
+         * Méthode appelée pour chaque classe annotée par WithSensors
+         * 
+         * @param cp
+         * @param string
+         * @param cc CtClass de Robot
+         * @throws Exception 
+         */
         @Override
         public void onLoad(ClassPool cp, String string, final CtClass cc) throws Exception {
             
@@ -66,12 +80,26 @@ public class MainJavassist_2 {
         }
     }
 
+    /**
+     * Utilitaire de parcours simplifié d'annotations pour une classe donnée
+     */
     private static class WalkAnnotations {
 
+        /**
+         * Interface à implémenter si l'on veut recevoir pour chaque annotation
+         * trouvée sur une méthode donnée, un évènement
+         * Il s'agit donc du handler d'annotations
+         */
         public interface IAnnotationWalker {
             public void walk(CtMethod m, Annotation a) throws Exception;
         }
 
+        /**
+         * Parcours des annotations de l'ensemble des méthodes d'une classe donnée
+         * 
+         * @param c
+         * @param walker handler d'annotations
+         */
         public void walk(CtClass c, IAnnotationWalker walker) {
             for (CtMethod method : c.getMethods()) {
                 try {
@@ -89,11 +117,40 @@ public class MainJavassist_2 {
         }
     }
     
+    /**
+     * Nous permet de "génériser" le parcours des annotations en dispatchant automatiquement
+     * le traitement de telle ou telle annotation vers la méthode adéquate
+     */
     public static interface Makeable extends InvocationHandler {
+        
+        /**
+         * Finalisation de la fabrication de l'objet makeable
+         * 
+         * @throws Exception 
+         */
         public void make() throws Exception;
+        
+        /**
+         * Traitement générique de l'annotation (par reflexion)
+         * Si l'annotation est d'un type T qui nous permet de résoudre la recherche
+         * d'une méthode de signature :
+         *  processAnnotation(CtMethod m, String name, T sensor)
+         * alors, on délègue le traitement de l'annotation à cette dernière
+         * 
+         * @param m
+         * @param name
+         * @param sensor
+         * @throws Exception 
+         */
         public void processAnnotation(CtMethod m, String name, Annotation sensor) throws Exception;
+        
     }
     
+    /**
+     * La Frabrique de robot est la classe qui est chargée d'aggréger l'ensemble des
+     * traitements qu'il nous sera possible pour telle ou telle annotation trouvée
+     * qu'elle soit de type Sensor ou Actuator
+     */
     public static class RobotMaker implements Makeable {
         
         private StringBuffer tmpQueue = new StringBuffer();
@@ -115,6 +172,14 @@ public class MainJavassist_2 {
             System.out.println("> process annotations :");
         }
         
+        /**
+         * On cherche, pour une annotation donnée, la méthode qui la traite
+         * 
+         * @param m
+         * @param name
+         * @param a
+         * @throws Exception 
+         */
         @Override        
         public void processAnnotation(CtMethod m, String name, Annotation a) throws Exception {
             Method process;
@@ -143,6 +208,11 @@ public class MainJavassist_2 {
             // tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.SensorData.BooleanSensorCapsule(new Boolean(robot.get" + name + "()), sensor));"));
         }
         
+        /**
+         * On génére le code à partir des senseurs et des actuateurs trouvés
+         * 
+         * @throws Exception 
+         */
         @Override
         public void make() throws Exception {
             if (hasSensors()) {
