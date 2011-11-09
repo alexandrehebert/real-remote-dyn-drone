@@ -1,8 +1,8 @@
 package fr.upmc.r2d2.components.displays;
 
 import fr.upmc.dtgui.annotations.VariationType;
-import fr.upmc.r2d2.tools.AbstractDisplayPanel;
-import fr.upmc.r2d2.tools.JComponentFactory;
+import fr.upmc.r2d2.components.AbstractDisplayPanel;
+import fr.upmc.r2d2.components.JComponentFactory;
 import javax.swing.JSlider;
 
 /**

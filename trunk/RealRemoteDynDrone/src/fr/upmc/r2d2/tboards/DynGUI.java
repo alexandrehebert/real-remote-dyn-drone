@@ -1,9 +1,5 @@
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.tboards;
 
-import fr.upmc.dtgui.example.gui.AnotherLittleRobotTeleoperationBoard;
-import fr.upmc.dtgui.example.gui.LittleRobotTeleoperationBoard;
-import fr.upmc.dtgui.example.robot.AnotherLittleRobot;
-import fr.upmc.dtgui.example.robot.LittleRobot;
 import fr.upmc.dtgui.gui.RobotTeleoperationBoard;
 import fr.upmc.dtgui.gui.SensorDataReceptorInterface;
 import fr.upmc.dtgui.gui.TeleoperationGUI;

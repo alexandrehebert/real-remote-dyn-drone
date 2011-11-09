@@ -1,6 +1,8 @@
 //	RobotTeleoperationBoard.java --- 
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.tboards;
 
+import fr.upmc.r2d2.components.AbstractControllerPanel;
+import fr.upmc.r2d2.components.AbstractDisplayPanel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +26,7 @@ import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.robot.PositioningData;
 import fr.upmc.dtgui.robot.Robot;
 import fr.upmc.dtgui.robot.RobotStateData;
+import fr.upmc.r2d2.tools.MessageData;
 import java.util.HashMap;
 
 /**

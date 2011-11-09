@@ -1,6 +1,7 @@
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.tboards;
 
 import fr.upmc.dtgui.robot.PositioningData;
+import fr.upmc.r2d2.tools.MessageData;
 
 /**
  * @author Alexandre Hebert
