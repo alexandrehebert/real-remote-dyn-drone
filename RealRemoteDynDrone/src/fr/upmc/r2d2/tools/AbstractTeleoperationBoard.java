@@ -56,6 +56,7 @@ public abstract class AbstractTeleoperationBoard
     protected TeleoperationGUI tgui;
     protected Robot lr;
     protected AbstractPanel[] panels;
+    protected int nbSensors = 1;
 
     public AbstractTeleoperationBoard(
             TeleoperationGUI tgui,
@@ -180,7 +181,7 @@ public abstract class AbstractTeleoperationBoard
 
         final protected PositionDisplay positionDisplay;
         protected AbstractTeleoperationBoard tBoard;
-        final protected BlockingQueue<RobotStateData> dataQueue;
+        final protected BlockingQueue dataQueue;
         protected int absoluteX;
         protected int absoluteY;
         protected int controlRadius;
@@ -188,7 +189,7 @@ public abstract class AbstractTeleoperationBoard
 
         public SensorDataReceptor(
                 PositionDisplay positionDisplay,
-                BlockingQueue<RobotStateData> dataQueue,
+                BlockingQueue dataQueue,
                 int absoluteX,
                 int absoluteY,
                 int controlRadius) {
@@ -217,11 +218,14 @@ public abstract class AbstractTeleoperationBoard
 
         @Override
         public void run() {
-            RobotStateData rsd = null;
-            Vector<RobotStateData> current = new Vector<RobotStateData>(4);
+            if (nbSensors == 0) return;
+            
+            MessageData rsd = null;
+            Vector<MessageData> current = new Vector(nbSensors);
+            
             while (this.shouldContinue) {
                 try {
-                    rsd = this.dataQueue.take();		// wait if empty...
+                    rsd = (MessageData) this.dataQueue.take();		// wait if empty...
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -241,7 +245,7 @@ public abstract class AbstractTeleoperationBoard
                                     });
                         } else {
                             if (this.tBoard != null) {
-                                final RobotStateData rsd1 = rsd;
+                                final MessageData rsd1 = rsd;
                                 SwingUtilities.invokeAndWait(
                                         new Runnable() {
 
@@ -288,12 +292,12 @@ public abstract class AbstractTeleoperationBoard
     class ActuatorDataSender extends Thread
             implements ActuatorDataSenderInterface {
 
-        protected RobotActuatorCommand rac;
-        protected BlockingQueue<RobotActuatorCommand> commandQueue;
+        protected MessageData rac;
+        protected BlockingQueue commandQueue;
 
         public ActuatorDataSender(
-                RobotActuatorCommand rac,
-                BlockingQueue<RobotActuatorCommand> commandQueue) {
+                MessageData rac,
+                BlockingQueue commandQueue) {
             super();
             this.rac = rac;
             this.commandQueue = commandQueue;

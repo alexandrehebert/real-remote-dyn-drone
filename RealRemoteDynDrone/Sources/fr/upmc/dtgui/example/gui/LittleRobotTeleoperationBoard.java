@@ -1,7 +1,7 @@
 //	RobotTeleoperationBoard.java --- 
 package fr.upmc.dtgui.example.gui;
 
-import fr.upmc.r2d2.tools.SensorData;
+import fr.upmc.r2d2.tools.MessageData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -36,9 +36,6 @@ import fr.upmc.dtgui.robot.PositioningData;
 import fr.upmc.dtgui.robot.Robot;
 import fr.upmc.dtgui.robot.RobotActuatorCommand;
 import fr.upmc.dtgui.robot.RobotStateData;
-import fr.upmc.r2d2.tools.AbstractControllerPanel;
-import fr.upmc.r2d2.tools.AbstractDisplayPanel;
-import fr.upmc.r2d2.tools.AbstractPanel;
 
 /**
  * The class <code>RobotTeleoperationBoard</code> implements a teleoperation

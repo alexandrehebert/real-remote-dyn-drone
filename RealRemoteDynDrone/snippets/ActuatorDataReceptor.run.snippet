@@ -1,9 +1,8 @@
 public void run() {
-    RobotActuatorCommand rac = null;
+    ActuatorCommand ac = new ActuatorCommand(lr);
     while (true) {
         try {
-            rac = this.commandQueue.take();
-            rac.performOn(lr);
+            ac.perform((MessageData) this.commandQueue.take());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
