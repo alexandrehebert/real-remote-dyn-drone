@@ -1,6 +1,9 @@
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.components.controllers;
 
+import fr.upmc.r2d2.tools.AbstractControllerPanel;
 import fr.upmc.r2d2.tools.AbstractTeleoperationBoard.ActuatorDataSender;
+import fr.upmc.r2d2.tools.JComponentFactory;
+import fr.upmc.r2d2.tools.MessageData;
 import java.util.EventListener;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.DefaultBoundedRangeModel;

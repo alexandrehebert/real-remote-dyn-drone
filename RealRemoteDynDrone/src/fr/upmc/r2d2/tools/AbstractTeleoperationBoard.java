@@ -23,8 +23,8 @@ import fr.upmc.dtgui.gui.TeleoperationGUI;
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.robot.PositioningData;
 import fr.upmc.dtgui.robot.Robot;
-import fr.upmc.dtgui.robot.RobotActuatorCommand;
 import fr.upmc.dtgui.robot.RobotStateData;
+import java.util.HashMap;
 
 /**
  * The class <code>RobotTeleoperationBoard</code> implements a teleoperation
@@ -55,8 +55,10 @@ public abstract class AbstractTeleoperationBoard
     private static final long serialVersionUID = 1L;
     protected TeleoperationGUI tgui;
     protected Robot lr;
-    protected AbstractPanel[] panels;
-    protected int nbSensors = 1;
+    
+    protected GroupPanel[] panels;    
+    protected final HashMap<String, AbstractDisplayPanel> displays = new HashMap();
+    protected final HashMap<String, AbstractControllerPanel> controllers = new HashMap();
 
     public AbstractTeleoperationBoard(
             TeleoperationGUI tgui,
@@ -66,12 +68,19 @@ public abstract class AbstractTeleoperationBoard
         this.setSize(size, 250);
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        for (AbstractPanel jp : (panels = getPanels()))
+        
+        for (GroupPanel jp : (panels = getPanels())) {
             this.add(jp);
+        }
+        
         this.setVisible(false);
     }
-    
-    public abstract AbstractPanel[] getPanels();
+
+    /**
+     * A générer par javassist
+     * @return 
+     */
+    public abstract GroupPanel[] getPanels();
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -83,14 +92,16 @@ public abstract class AbstractTeleoperationBoard
     @Override
     public void connectRobot(InstrumentedRobot lr) {
         this.lr = lr;
-        for (AbstractPanel jp : panels)
+        for (AbstractControllerPanel jp : controllers.values()) {
             jp.connectRobot(lr);
+        }
     }
 
     @Override
     public void disconnectRobot(InstrumentedRobot lr) {
-        for (AbstractPanel jp : panels)
-            jp.disconnectRobot(lr);
+        for (AbstractControllerPanel jp : controllers.values()) {
+            jp.disconnectRobot();
+        }
         this.lr = null;
     }
 
@@ -99,38 +110,13 @@ public abstract class AbstractTeleoperationBoard
         return this.lr != null;
     }
 
-    public void updateEnergy(EnergyData ed) {
-        this.ecv.updateEnergy(ed);
-    }
-
-    public void updateSpeed(SpeedData sd) {
-        this.sp.updateSpeed(sd);
-    }
-
-    public void updateSteeringAngle(SteeringData sd) {
-        this.stp.updateSteeringAngle(sd);
-    }
-
     /**
      * process incoming sensor data.
      * 
      * @see fr.upmc.dtgui.gui.RobotTeleoperationBoard#processSensorData(fr.upmc.dtgui.robot.RobotStateData)
      */
-    public void processSensorData(RobotStateData rsd) {
-        // Series of instanceof tests are particularly non-object-oriented,
-        // but here we do not want to expose in advance the processing
-        // methods defined above because the code of this teleoperation board
-        // is not supposed to be known at the time the code on the robot side
-        // that sends these sensory data is generated.
-        if (rsd instanceof PositioningData) {
-            this.tgui.getPositionDisplay().draw((PositioningData) rsd);
-        } else if (rsd instanceof EnergyData) {
-            this.updateEnergy((EnergyData) rsd);
-        } else if (rsd instanceof SpeedData) {
-            this.updateSpeed((SpeedData) rsd);
-        } else if (rsd instanceof SteeringData) {
-            this.updateSteeringAngle((SteeringData) rsd);
-        }
+    public void processSensorData(MessageData data) {
+        displays.get(data.getKey()).update(data.getValue());
     }
 
     /**
@@ -149,7 +135,7 @@ public abstract class AbstractTeleoperationBoard
      */
     public SensorDataReceptorInterface makeSensorDataReceptor(
             PositionDisplay positionDisplay,
-            BlockingQueue<RobotStateData> dataQueue,
+            BlockingQueue dataQueue,
             int absoluteX,
             int absoluteY,
             int controlRadius) {
@@ -218,11 +204,14 @@ public abstract class AbstractTeleoperationBoard
 
         @Override
         public void run() {
-            if (nbSensors == 0) return;
-            
+            if (displays.isEmpty()) {
+                return;
+            }
+
             MessageData rsd = null;
-            Vector<MessageData> current = new Vector(nbSensors);
-            
+            Vector<MessageData> current = new Vector(displays.size());
+            PositioningData pd = null;
+
             while (this.shouldContinue) {
                 try {
                     rsd = (MessageData) this.dataQueue.take();		// wait if empty...
@@ -233,17 +222,21 @@ public abstract class AbstractTeleoperationBoard
                 int n = this.dataQueue.drainTo(current);	// do not wait...
                 for (int i = 0; i <= n; i++) {
                     rsd = current.elementAt(i);
-                    try {
-                        if (rsd instanceof PositioningData) {
-                            final PositioningData pd = (PositioningData) rsd;
+                    try {                        
+                        if ((pd = PositioningDataFactory.getInstance().eat(rsd)) != null) {
+                            final PositioningData pdf = (PositioningData) pd;
+
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
 
                                         public void run() {
-                                            positionDisplay.draw(pd);
+                                            positionDisplay.draw(pdf);
                                         }
                                     });
                         } else {
+                            if (rsd.getGroupName().equals("position"))
+                                continue;
+                            
                             if (this.tBoard != null) {
                                 final MessageData rsd1 = rsd;
                                 SwingUtilities.invokeAndWait(
@@ -289,7 +282,7 @@ public abstract class AbstractTeleoperationBoard
      * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
      * @version	$Name$ -- $Revision$ -- $Date$
      */
-    class ActuatorDataSender extends Thread
+    public static class  ActuatorDataSender extends Thread
             implements ActuatorDataSenderInterface {
 
         protected MessageData rac;
@@ -321,7 +314,6 @@ public abstract class AbstractTeleoperationBoard
             }
         }
     }
-    
 }
 
 // $Id$
