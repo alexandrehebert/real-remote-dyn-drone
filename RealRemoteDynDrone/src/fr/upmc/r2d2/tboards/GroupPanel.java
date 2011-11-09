@@ -1,4 +1,4 @@
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.tboards;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;

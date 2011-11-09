@@ -1,4 +1,4 @@
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.components;
 
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import java.util.EventListener;
