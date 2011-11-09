@@ -268,6 +268,8 @@ public class MainJavassist_2 {
             }
             
             robot.writeFile();
+            
+            /* créer le tboard associé */
         }
 
         public void makeSensors() throws Exception {
