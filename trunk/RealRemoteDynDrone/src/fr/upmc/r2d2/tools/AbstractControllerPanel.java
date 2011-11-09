@@ -3,6 +3,7 @@ package fr.upmc.r2d2.tools;
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import java.util.EventListener;
 import java.util.concurrent.BlockingQueue;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
@@ -11,20 +12,22 @@ import javax.swing.JPanel;
  */
 public abstract class AbstractControllerPanel extends JPanel {
     
-    protected InstrumentedRobot lr;
     protected EventListener el;
+    protected InstrumentedRobot r;
+    protected JComponent view;
     
-    public void disconnectRobot(InstrumentedRobot lr) {
+    public void disconnectRobot() {
+        this.r = null;
         disconnect(el);
-        this.lr = null;
     }
-
-    public void connectRobot(InstrumentedRobot lr) {
-        this.lr = lr;
-        el = connect(lr.getActuatorDataQueue());
+    
+    public void connectRobot(InstrumentedRobot r) {
+        this.r = r;
+        el = connect(r.getActuatorDataQueue());
     }
     
     public abstract EventListener connect(BlockingQueue bq);
     public abstract void disconnect(EventListener el);
     
+    public abstract JComponent getComponent();
 }

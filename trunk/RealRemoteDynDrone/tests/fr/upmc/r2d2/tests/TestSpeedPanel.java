@@ -3,7 +3,7 @@ package fr.upmc.r2d2.tests;
 import fr.upmc.r2d2.tools.AbstractControllerPanel;
 import fr.upmc.r2d2.tools.AbstractDisplayPanel;
 import fr.upmc.r2d2.tools.AbstractPanel;
-import fr.upmc.r2d2.tools.SensorData;
+import fr.upmc.r2d2.tools.MessageData;
 import java.awt.FlowLayout;
 import java.util.EventListener;
 import java.util.concurrent.BlockingQueue;
@@ -53,7 +53,7 @@ public class TestSpeedPanel extends AbstractPanel {
             }
 
             @Override
-            public void update(SensorData sd) {
+            public void update(MessageData sd) {
                 model.setValue((int) Math.round((Integer) sd.getValue()));
             }
         });
