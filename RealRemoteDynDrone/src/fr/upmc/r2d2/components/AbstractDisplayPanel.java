@@ -8,8 +8,8 @@ import javax.swing.JComponent;
  */
 public abstract class AbstractDisplayPanel<J extends JComponent> extends AbstractPanel<J> {
 
-    public AbstractDisplayPanel() {
-        super();
+    public AbstractDisplayPanel(String groupName, String methodName, double minRate, double maxRate) {
+        super(groupName, methodName, minRate, maxRate);
     }
 
     /**
