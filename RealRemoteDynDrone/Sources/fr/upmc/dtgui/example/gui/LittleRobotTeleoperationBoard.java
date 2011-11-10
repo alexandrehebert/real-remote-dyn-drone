@@ -1,7 +1,7 @@
 //	RobotTeleoperationBoard.java --- 
 package fr.upmc.dtgui.example.gui;
 
-import fr.upmc.r2d2.tools.MessageData;
+import fr.upmc.r2d2.robots.MessageData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;

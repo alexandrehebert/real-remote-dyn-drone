@@ -1,13 +1,14 @@
 package fr.upmc.r2d2.boards;
 
 import fr.upmc.dtgui.robot.PositioningData;
-import fr.upmc.r2d2.tools.MessageData;
+import fr.upmc.r2d2.robots.MessageData;
 
 /**
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
 public class PositioningDataFactory {
+    
     private final String labelx = "getX";
     private final String labely = "getY";
     private final String labeld = "getDirection";
@@ -30,7 +31,7 @@ public class PositioningDataFactory {
         
     }*/
     
-    private double x, y, d;
+    private Double x, y, d;
     private int stamp = 0;
 
     public PositioningData eat(MessageData data) {
@@ -41,11 +42,11 @@ public class PositioningDataFactory {
         }*/
         
         switch (data.getKey()) {
-            case labelx: x = (Integer) data.getValue();
+            case labelx: x = (Double) data.getValue();
                 break;
-            case labely: y = (Integer) data.getValue();
+            case labely: y = (Double) data.getValue();
                 break;
-            case labeld: d = (Integer) data.getValue();
+            case labeld: d = (Double) data.getValue();
                 break;    
             default: return null; /* erreur :-) */
         }

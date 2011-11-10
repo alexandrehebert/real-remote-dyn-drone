@@ -6,8 +6,8 @@ import java.util.concurrent.BlockingQueue;
 
 public interface		InstrumentedRobot	extends Robot {
 
-	BlockingQueue<RobotStateData>		getSensorDataQueue();
-	BlockingQueue<RobotActuatorCommand>	getActuatorDataQueue();
+	BlockingQueue		getSensorDataQueue();
+	BlockingQueue	getActuatorDataQueue();
 	double	getX();
 	double	getY();
 	void	start();

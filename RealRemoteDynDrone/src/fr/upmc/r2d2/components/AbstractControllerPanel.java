@@ -28,7 +28,7 @@ public abstract class AbstractControllerPanel<J extends JComponent> extends Abst
         el = connect(r.getActuatorDataQueue());
     }
 
-    public abstract EventListener connect(BlockingQueue bq);
+    public abstract EventListener connect(final BlockingQueue bq);
 
     public abstract void disconnect(EventListener el);
     

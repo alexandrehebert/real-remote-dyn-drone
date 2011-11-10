@@ -88,6 +88,7 @@ public class World extends Thread {
             for (int i = 0; i < this.instrumentedRobots.length; i++) {
                 int xRobot = (int) this.instrumentedRobots[i].getX();
                 int yRobot = (int) this.instrumentedRobots[i].getY();
+                
                 for (int j = 0; j < this.teleoperationStations.length; j++) {
                     int xStation =
                             this.teleoperationStations[j].getAbsoluteX();

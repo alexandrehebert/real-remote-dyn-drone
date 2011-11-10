@@ -1,7 +1,6 @@
 package fr.upmc.r2d2.robots;
 
 import fr.upmc.dtgui.robot.InstrumentedRobot;
-import fr.upmc.r2d2.tools.MessageData;
 import fr.upmc.r2d2.tools.Utils;
 import java.lang.reflect.Method;
 

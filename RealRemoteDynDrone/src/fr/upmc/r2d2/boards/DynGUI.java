@@ -7,6 +7,7 @@ import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.robot.Robot;
 import java.awt.HeadlessException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * @author Alexandre Hebert
@@ -15,6 +16,7 @@ import java.util.HashMap;
 public class DynGUI extends TeleoperationGUI {
 
     private static final long serialVersionUID = 1L;
+    private HashMap<Class<? extends Robot>, RobotTeleoperationBoard> boards = new HashMap();
 
     public DynGUI(
             String panelName,
@@ -28,40 +30,29 @@ public class DynGUI extends TeleoperationGUI {
         super(panelName, absoluteX, absoluteY, relativeX, relativeY,
                 controlRadius, sizeX, sizeY);
         /* ici on initialisera la map boards avec Javassist */
-        
-        /*
-         * boards.put(RobotA.class, new RobotATeleoperationBoard(this, sizeX - 50));
-         * 
-         */
     }
     
-    private HashMap<Class<? extends Robot>, RobotTeleoperationBoard> boards = new HashMap();
-
-    public RobotTeleoperationBoard createBoard(InstrumentedRobot lr) {
-        RobotTeleoperationBoard board = boards.get(lr.getClass());
-        
-        if (board == null) {
-            System.out.println("Unknown type of robot : "
-                    + lr.getClass().getCanonicalName());
-            System.exit(1);
-        }
-        
-        return board;
+    public RobotTeleoperationBoard createBoard(InstrumentedRobot r) {
+        return checkBoard(r.getClass());
     }
 
     public SensorDataReceptorInterface createSensorDataReceptor(
-            InstrumentedRobot lr,
+            InstrumentedRobot r,
             RobotTeleoperationBoard board) {
-        
-        if (boards.containsKey(lr.getClass())){
+        checkBoard(r.getClass());
+        return board.makeSensorDataReceptor(
+                    this.positionDisplay, r.getSensorDataQueue(),
+                this.absoluteX, this.absoluteY, this.controlRadius);
+    }
+
+    public RobotTeleoperationBoard checkBoard(Class<? extends Robot> r) {
+        if (!boards.containsKey(r)) {
             // TODO: create an exception type
             System.out.println("Unknown type of robot : "
-                    + lr.getClass().getCanonicalName());
+                    + r.getCanonicalName());
             System.exit(1);
         }
-        
-        return board.makeSensorDataReceptor(
-                    this.positionDisplay, lr.getSensorDataQueue(),
-                    this.absoluteX, this.absoluteY, this.controlRadius);
+        return boards.get(r);
     }
+    
 }

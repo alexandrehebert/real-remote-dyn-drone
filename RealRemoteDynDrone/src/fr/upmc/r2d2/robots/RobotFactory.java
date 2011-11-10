@@ -2,6 +2,7 @@ package fr.upmc.r2d2.robots;
 
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.r2d2.tools.Utils;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +15,13 @@ public class RobotFactory {
     public static InstrumentedRobot make(Class robotClass, Object... args) {
         List<Class> cargs = new ArrayList();
         
-        for(Object arg : args)
-            cargs.add(arg.getClass());
+        for(Object arg : args) {
+            /**
+             * @TODO solution temporaire pour pallier au type primitif
+             */
+            cargs.add(arg.getClass().getSimpleName().equals("Double") ? 
+                    double.class : arg.getClass());
+        }
         
         try {
             return (InstrumentedRobot) robotClass.getConstructor(cargs.toArray(new Class[] {})).newInstance(args);

@@ -1,6 +1,5 @@
 package fr.upmc.r2d2.tools;
 
-import fr.upmc.dtgui.robot.InstrumentedRobot;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,8 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Alexandre Hebert
@@ -18,7 +15,7 @@ import java.util.List;
 public class Utils {
 
     private static boolean verbose = true;
-
+    
     /**
      * Debug
      * 
@@ -31,6 +28,20 @@ public class Utils {
         // System.out.println(t.getMessage());
         System.err.println(t.getMessage());
         t.printStackTrace(System.err);
+    }
+    
+    private static StringBuffer logger = new StringBuffer();
+    
+    public static void log(String l) {
+        if (logger.length() == 0)
+            Runtime.getRuntime().addShutdownHook(new Thread(){
+                public void run() {
+                    System.out.println(logger);
+                }
+            });     
+        
+        logger.append(l).append("\n");
+   
     }
 
     /**

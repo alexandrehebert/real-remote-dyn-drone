@@ -1,10 +1,17 @@
 public void run() {
     while (true) {
+        if (dataQueue == null)
+            System.out.println("DataQueue vide !");
+
+        if (robot == null) {
+            System.out.println("Robot vide !");
+        }
+
         dataQueue.clear();
         #TMPQUEUE#
         try {
             Thread.sleep((long)sleep);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
