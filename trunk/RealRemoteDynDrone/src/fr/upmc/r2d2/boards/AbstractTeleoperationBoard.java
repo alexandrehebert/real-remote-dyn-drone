@@ -23,7 +23,7 @@ import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.robot.PositioningData;
 import fr.upmc.dtgui.robot.Robot;
 import fr.upmc.dtgui.robot.RobotStateData;
-import fr.upmc.r2d2.tools.MessageData;
+import fr.upmc.r2d2.robots.MessageData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -241,9 +241,10 @@ public abstract class AbstractTeleoperationBoard
         @Override
         public void run() {
             if (displays.isEmpty()) {
+                System.out.println("Display empty");
                 return;
             }
-
+            
             MessageData rsd = null;
             Vector<MessageData> current = new Vector(displays.size());
             PositioningData pd = null;
@@ -258,13 +259,13 @@ public abstract class AbstractTeleoperationBoard
                 int n = this.dataQueue.drainTo(current);	// do not wait...
                 for (int i = 0; i <= n; i++) {
                     rsd = current.elementAt(i);
-                    try {                        
+                    try {
+                        
                         if ((pd = PositioningDataFactory.getInstance().eat(rsd)) != null) {
                             final PositioningData pdf = (PositioningData) pd;
 
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
-
                                         public void run() {
                                             positionDisplay.draw(pdf);
                                         }
@@ -277,7 +278,6 @@ public abstract class AbstractTeleoperationBoard
                                 final MessageData rsd1 = rsd;
                                 SwingUtilities.invokeAndWait(
                                         new Runnable() {
-
                                             public void run() {
                                                 if (tBoard != null) {
                                                     tBoard.processSensorData(rsd1);

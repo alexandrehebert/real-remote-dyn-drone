@@ -1,11 +1,11 @@
 //	World.java --- 
 package fr.upmc.r2d2;
 
-import fr.upmc.dtgui.example.robot.AnotherLittleRobot;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 import fr.upmc.dtgui.gui.TeleoperationGUI;
 import fr.upmc.dtgui.robot.InstrumentedRobot;
+import fr.upmc.dtgui.tests.AnotherLittleRobot;
 import fr.upmc.dtgui.tests.FirstLittleRobot;
 import fr.upmc.r2d2.boards.DynGUI;
 import fr.upmc.r2d2.robots.RobotFactory;
@@ -67,6 +67,7 @@ public class World extends Thread {
 
     public final void createRobots() {
         this.instrumentedRobots = new InstrumentedRobot[]{
+            /*double x, double y, double direction */
             RobotFactory.make(FirstLittleRobot.class, "No 001", 2000.0, 950.0, 45.0),
             RobotFactory.make(AnotherLittleRobot.class, "No 002", 2850.0, 950.0, 135.0, 10.0)
         };
@@ -74,8 +75,8 @@ public class World extends Thread {
 
     public final void createGUIs() {
         this.teleoperationStations = new TeleoperationGUI[]{
-            new DynGUI("2", 3500, 1500, 500, 500, 400, 1000, 1000),
-            new DynGUI("2", 3500, 1500, 500, 500, 400, 1000, 1000)
+            new DynGUI("1", 2500, 1500, 500, 500, 400, 1000, 600),
+            new DynGUI("2", 3500, 1500, 500, 500, 400, 1000, 600)
         };
     }
 
@@ -83,9 +84,11 @@ public class World extends Thread {
         super.start();
         for (int i = 0; i < this.teleoperationStations.length; i++) {
             this.teleoperationStations[i].start();
+            System.out.println(this.teleoperationStations[i].getName() + " running");
         }
         for (int i = 0; i < this.instrumentedRobots.length; i++) {
             this.instrumentedRobots[i].start();
+            System.out.println(this.instrumentedRobots[i].getRobotName() + " running");
         }
     }
 
@@ -94,6 +97,7 @@ public class World extends Thread {
             for (int i = 0; i < this.instrumentedRobots.length; i++) {
                 int xRobot = (int) this.instrumentedRobots[i].getX();
                 int yRobot = (int) this.instrumentedRobots[i].getY();
+                
                 for (int j = 0; j < this.teleoperationStations.length; j++) {
                     int xStation =
                             this.teleoperationStations[j].getAbsoluteX();
@@ -105,9 +109,10 @@ public class World extends Thread {
                             this.teleoperationStations[j].getSizeY() / 2;
                     int controlRadius =
                             this.teleoperationStations[j].getControlRadius();
+                    
                     final InstrumentedRobot lr = this.instrumentedRobots[i];
-                    final TeleoperationGUI tgui =
-                            this.teleoperationStations[j];
+                    final TeleoperationGUI tgui = this.teleoperationStations[j];
+                    
                     if (xRobot >= (xStation - sizeXdiv2)
                             && xRobot <= (xStation + sizeXdiv2)
                             && yRobot >= (yStation - sizeYdiv2)
@@ -115,8 +120,8 @@ public class World extends Thread {
                         try {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
-
                                         public void run() {
+                                            System.out.println("$ Run detection robot : " + lr.getRobotName());
                                             tgui.detectRobot(lr);
                                         }
                                     });
@@ -129,8 +134,8 @@ public class World extends Thread {
                         try {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
-
                                         public void run() {
+                                            System.out.println("$ Kill detection robot : " + lr.getRobotName());
                                             tgui.undetectRobot(lr);
                                         }
                                     });
@@ -146,8 +151,8 @@ public class World extends Thread {
                         try {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
-
                                         public void run() {
+                                            System.out.println("$ Make controllable robot : " + lr.getRobotName());
                                             tgui.makeControllable(lr);
                                         }
                                     });
@@ -160,8 +165,8 @@ public class World extends Thread {
                         try {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
-
                                         public void run() {
+                                            System.out.println("$ Make uncontrollable robot : " + lr.getRobotName());
                                             tgui.makeUncontrollable(lr);
                                         }
                                     });

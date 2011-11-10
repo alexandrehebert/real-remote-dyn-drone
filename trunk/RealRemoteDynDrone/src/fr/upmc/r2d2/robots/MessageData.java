@@ -1,4 +1,4 @@
-package fr.upmc.r2d2.tools;
+package fr.upmc.r2d2.robots;
 
 import java.util.HashMap;
 

@@ -1,5 +1,4 @@
 //	TeleoperationGUI.java --- 
-
 package fr.upmc.dtgui.gui;
 
 import java.awt.BorderLayout;
@@ -58,374 +57,380 @@ import fr.upmc.dtgui.robot.Robot;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  * @version	$Name$ -- $Revision$ -- $Date$
  */
-public abstract class	TeleoperationGUI	extends JFrame
-{
+public abstract class TeleoperationGUI extends JFrame {
 
-	private static final long		serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    /**
+     * The upper part of the station window, featuring a radar-like display
+     * allowing to see the position of the different robots.
+     */
+    protected PositionDisplay positionDisplay;
+    /**
+     * The lower part of the station window, which will contain a set of
+     * buttons for choosing among the different robots the one that will be
+     * operated, and a blank space to add the teleoperation board specific
+     * to each robot.
+     */
+    protected JPanel lowerBoard;
+    /**
+     * A panel which will contain the buttons used to select the robot to
+     * be teleoperated.
+     */
+    protected RobotSelector robotSelector;
+    /**
+     * The robot which is currently selected to be teleoperated.
+     */
+    protected InstrumentedRobot currentlySelected;
+    /**
+     * Mapping from robots to their teleoperation board.
+     */
+    protected Hashtable<Robot, RobotTeleoperationBoard> boards;
+    /**
+     * Mapping from robots to their sensor data receptor.
+     */
+    protected Hashtable<Robot, SensorDataReceptorInterface> sensors;
+    /** X position of the station (center) in the world coordinates.	*/
+    final protected int absoluteX;
+    /** Y position of the station (center) in the world coordinates.	*/
+    final protected int absoluteY;
+    /** X position of the station (center) in the station coordinates.	*/
+    final protected int relativeX;
+    /** Y position of the station (center) in the station coordinates.	*/
+    final protected int relativeY;
+    /** Distance from the station under which robot can be controlled.	*/
+    final protected int controlRadius;
+    /** Size of the visibility area of the station in the X dimension.	*/
+    final protected int sizeX;
+    /** Size of the visibility area of the station in the Y dimension.	*/
+    final protected int sizeY;
 
-	/**
-	 * The upper part of the station window, featuring a radar-like display
-	 * allowing to see the position of the different robots.
-	 */
-	protected PositionDisplay		positionDisplay ;
-	/**
-	 * The lower part of the station window, which will contain a set of
-	 * buttons for choosing among the different robots the one that will be
-	 * operated, and a blank space to add the teleoperation board specific
-	 * to each robot.
-	 */
-	protected JPanel				lowerBoard ;
-	/**
-	 * A panel which will contain the buttons used to select the robot to
-	 * be teleoperated.
-	 */
-	protected RobotSelector			robotSelector ;
-	/**
-	 * The robot which is currently selected to be teleoperated.
-	 */
-	protected InstrumentedRobot		currentlySelected ;
+    /**
+     * Creation of teleoperation station graphical user interface (GUI). 
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	absoluteX >= 0 && absoluteX <= World.MAX_X
+     * 		absoluteY >= 0 && absoluteY <= World.MAX_Y
+     * 		relativeX > 0 && relativeX == sizeX/2
+     *      relativeY > 0 && relativeY == sizeY/2
+     *      controlRadius <= sizeX && controlRadius <= sizeY
+     *      sizeX <= World.MAX_X
+     *      sizeY <= World.MAX_Y
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param absoluteX
+     * @param absoluteY
+     * @param relativeX
+     * @param relativeY
+     * @param controlRadius
+     * @param sizeX
+     * @param sizeY
+     * @throws HeadlessException
+     */
+    public TeleoperationGUI(
+            String panelName,
+            int absoluteX,
+            int absoluteY,
+            int relativeX,
+            int relativeY,
+            int controlRadius,
+            int sizeX,
+            int sizeY) throws HeadlessException {
+        super("Teleoperation Panel " + panelName + " @ (" + absoluteX + ", "
+                + absoluteY + ")");
+        this.setVisible(false);
+        this.absoluteX = absoluteX;
+        this.absoluteY = absoluteY;
+        this.relativeX = relativeX;
+        this.relativeY = relativeY;
+        this.controlRadius = controlRadius;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.setSize(this.sizeX, this.sizeY + 250);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
 
-	/**
-	 * Mapping from robots to their teleoperation board.
-	 */
-	protected Hashtable<Robot, RobotTeleoperationBoard>		boards ;
-	/**
-	 * Mapping from robots to their sensor data receptor.
-	 */
-	protected Hashtable<Robot,SensorDataReceptorInterface>	sensors ;
+        this.positionDisplay =
+                new PositionDisplay(Color.green, Color.BLACK, Color.LIGHT_GRAY,
+                this.absoluteX, this.absoluteY,
+                this.relativeX, this.relativeY,
+                this.controlRadius, this.sizeX, this.sizeY);
+        this.getContentPane().setLayout(new BorderLayout());
+        this.add(positionDisplay, BorderLayout.NORTH);
 
-	/** X position of the station (center) in the world coordinates.	*/
-	final protected int				absoluteX ;
-	/** Y position of the station (center) in the world coordinates.	*/
-	final protected int				absoluteY ;
-	/** X position of the station (center) in the station coordinates.	*/
-	final protected int				relativeX ;
-	/** Y position of the station (center) in the station coordinates.	*/
-	final protected int				relativeY ;
-	/** Distance from the station under which robot can be controlled.	*/
-	final protected int				controlRadius ;
-	/** Size of the visibility area of the station in the X dimension.	*/
-	final protected int				sizeX ;
-	/** Size of the visibility area of the station in the Y dimension.	*/
-	final protected int				sizeY ;
+        this.lowerBoard = new JPanel();
+        this.lowerBoard.setSize(sizeX, 250);
+        this.lowerBoard.setLayout(
+                new BoxLayout(this.lowerBoard, BoxLayout.X_AXIS));
+        this.robotSelector = new RobotSelector(this, 50, 250);
+        this.lowerBoard.add(this.robotSelector, BorderLayout.EAST);
+        this.lowerBoard.setBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 4));
+        this.lowerBoard.setVisible(true);
+        this.add(this.lowerBoard, BorderLayout.SOUTH);
 
-	/**
-	 * Creation of teleoperation station graphical user interface (GUI). 
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	absoluteX >= 0 && absoluteX <= World.MAX_X
-	 * 		absoluteY >= 0 && absoluteY <= World.MAX_Y
-	 * 		relativeX > 0 && relativeX == sizeX/2
-	 *      relativeY > 0 && relativeY == sizeY/2
-	 *      controlRadius <= sizeX && controlRadius <= sizeY
-	 *      sizeX <= World.MAX_X
-	 *      sizeY <= World.MAX_Y
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param absoluteX
-	 * @param absoluteY
-	 * @param relativeX
-	 * @param relativeY
-	 * @param controlRadius
-	 * @param sizeX
-	 * @param sizeY
-	 * @throws HeadlessException
-	 */
-	public				TeleoperationGUI(
-		String panelName,
-		int absoluteX,
-		int absoluteY,
-		int relativeX,
-		int relativeY,
-		int controlRadius,
-		int sizeX,
-		int sizeY
-		) throws HeadlessException
-	{
-		super("Teleoperation Panel " + panelName + " @ (" + absoluteX + ", "
-				+ absoluteY + ")");
-		this.setVisible(false) ;
-		this.absoluteX = absoluteX;
-		this.absoluteY = absoluteY;
-		this.relativeX = relativeX ;
-		this.relativeY = relativeY ;
-		this.controlRadius = controlRadius ;
-		this.sizeX = sizeX ;
-		this.sizeY = sizeY ;
-		this.setSize(this.sizeX, this.sizeY + 250) ;
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE) ;
-		this.setLocationRelativeTo(null) ;
+        this.boards = new Hashtable<Robot, RobotTeleoperationBoard>();
+        this.sensors = new Hashtable<Robot, SensorDataReceptorInterface>();
+    }
 
-		this.positionDisplay =
-			new PositionDisplay(Color.green, Color.BLACK, Color.LIGHT_GRAY,
-								this.absoluteX, this.absoluteY,
-								this.relativeX, this.relativeY,
-								this.controlRadius, this.sizeX, this.sizeY) ;
-		this.getContentPane().setLayout(new BorderLayout()) ;
-		this.add(positionDisplay, BorderLayout.NORTH) ;
-	
-		this.lowerBoard = new JPanel() ;
-		this.lowerBoard.setSize(sizeX, 250) ;
-		this.lowerBoard.setLayout(
-						new BoxLayout(this.lowerBoard, BoxLayout.X_AXIS)) ;
-		this.robotSelector = new RobotSelector(this, 50, 250) ;
-		this.lowerBoard.add(this.robotSelector, BorderLayout.EAST) ;
-		this.lowerBoard.setBorder(
-						BorderFactory.createLineBorder(Color.BLACK, 4)) ;
-		this.lowerBoard.setVisible(true) ;
-		this.add(this.lowerBoard, BorderLayout.SOUTH) ;
+    /** @return the absoluteX										*/
+    public int getAbsoluteX() {
+        return absoluteX;
+    }
 
-		this.boards = new Hashtable<Robot,RobotTeleoperationBoard>() ;
-		this.sensors = new Hashtable<Robot,SensorDataReceptorInterface>() ;
-	}
+    /** @return the absoluteY										*/
+    public int getAbsoluteY() {
+        return absoluteY;
+    }
 
-	/** @return the absoluteX										*/
-	public int			getAbsoluteX()		{ return absoluteX; }
+    /** @return the sizeX											*/
+    public int getSizeX() {
+        return sizeX;
+    }
 
-	/** @return the absoluteY										*/
-	public int			getAbsoluteY()		{ return absoluteY; }
+    /** @return the sizeY											*/
+    public int getSizeY() {
+        return sizeY;
+    }
 
-	/** @return the sizeX											*/
-	public int			getSizeX()			{ return sizeX; }
+    /** @return the controlRadius									*/
+    public int getControlRadius() {
+        return controlRadius;
+    }
 
-	/** @return the sizeY											*/
-	public int			getSizeY()			{ return sizeY; }
+    /** @return the positionDisplay									*/
+    public PositionDisplay getPositionDisplay() {
+        return positionDisplay;
+    }
 
-	/** @return the controlRadius									*/
-	public int			getControlRadius()	{ return controlRadius; }
+    /**
+     * check whther the robot lr has already been detected.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	true			// no precondition.
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param lr	robot to be checked.
+     * @return		true if lr has already been detected.
+     */
+    public boolean detected(Robot lr) {
+        return this.sensors.containsKey(lr);
+    }
 
-	/** @return the positionDisplay									*/
-	public PositionDisplay getPositionDisplay() { return positionDisplay; }
+    /**
+     * check if the robot lr is currently controllable (to be controlled, it
+     * must also be selected by the teleoperator).
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	true			// no precondition.
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param lr	robot to be checked.
+     * @return		true if lr is currently controllable.
+     */
+    public boolean controllable(Robot lr) {
+        boolean ret = false;
+        if (this.boards.containsKey(lr)) {
+            ret = (this.boards.get(lr)).isRobotConnected();
+        }
+        return ret;
+    }
 
-	/**
-	 * check whther the robot lr has already been detected.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param lr	robot to be checked.
-	 * @return		true if lr has already been detected.
-	 */
-	public boolean		detected(Robot lr) {
-		return this.sensors.containsKey(lr) ;
-	}
+    public void start() {
+        this.setVisible(true);
+    }
 
-	/**
-	 * check if the robot lr is currently controllable (to be controlled, it
-	 * must also be selected by the teleoperator).
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param lr	robot to be checked.
-	 * @return		true if lr is currently controllable.
-	 */
-	public boolean		controllable(Robot lr) {
-		boolean ret = false ;
-		if (this.boards.containsKey(lr)) {
-			ret = (this.boards.get(lr)).isRobotConnected() ;
-		}
-		return ret ;
-	}
+    /**
+     * makes a robot visible (but not yet controllable) from this teleoperation
+     * station when it enters its visibility area.  A sensor data receptor
+     * thread as well as a teleoperation board are created for this robot.
+     * The sensor data receptor is connected to the robot and to the position
+     * display and started to begin the reception of positioning data from the
+     * robot.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	true			// no precondition.
+     * post	this.detected(lr) && !this.controllable(lr)
+     * </pre>
+     *
+     * @param lr
+     */
+    public void detectRobot(InstrumentedRobot lr) {
+        // if this robot was not already detected, then detect
+        RobotTeleoperationBoard board = null;
+        SensorDataReceptorInterface sdr = null;
+        if (!this.detected(lr)) {
+            board = this.createBoard(lr);
+            sdr = this.createSensorDataReceptor(lr, board);
+            this.sensors.put(lr, sdr);
+            this.boards.put(lr, board);
+            sdr.start();
+            this.validate();
+        }
+    }
 
-	public void			start() {
-		this.setVisible(true) ;
-	}
+    /**
+     * create the teleoperation board fort the robot lr.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	true			// no precondition.
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param lr	robot for which the teleoperation board must be created.
+     * @return		the teleoperation board for the robot lr.
+     */
+    public abstract RobotTeleoperationBoard createBoard(InstrumentedRobot lr);
 
-	/**
-	 * makes a robot visible (but not yet controllable) from this teleoperation
-	 * station when it enters its visibility area.  A sensor data receptor
-	 * thread as well as a teleoperation board are created for this robot.
-	 * The sensor data receptor is connected to the robot and to the position
-	 * display and started to begin the reception of positioning data from the
-	 * robot.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	this.detected(lr) && !this.controllable(lr)
-	 * </pre>
-	 *
-	 * @param lr
-	 */
-	public void			detectRobot(InstrumentedRobot lr) {
-		// if this robot was not already detected, then detect
-		RobotTeleoperationBoard board = null ;
-		SensorDataReceptorInterface sdr = null ;
-		if (!this.detected(lr)) {
-			board = this.createBoard(lr) ;
-			sdr = this.createSensorDataReceptor(lr, board) ;
-			this.sensors.put(lr, sdr) ;
-			this.boards.put(lr, board) ;
-			sdr.start() ;
-			this.validate() ;
-		}
-	}
+    /**
+     * create the sensor data receptor thread for the robot lr and connects it
+     * to its teleoperation board.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	true			// no precondition.
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param lr	the robot for which the thread must be created.
+     * @param board	the teleoperation board of the robot lr.
+     * @return
+     */
+    public abstract SensorDataReceptorInterface createSensorDataReceptor(
+            InstrumentedRobot lr,
+            RobotTeleoperationBoard board);
 
-	/**
-	 * create the teleoperation board fort the robot lr.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param lr	robot for which the teleoperation board must be created.
-	 * @return		the teleoperation board for the robot lr.
-	 */
-	public abstract RobotTeleoperationBoard	createBoard(InstrumentedRobot lr) ;
+    /**
+     * makes a robot no longer visible from this teleoperation station when it
+     * exits its visibility area.  The sensor data receptor thread for this
+     * robot is deleted.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	this.detected(lr)
+     * post	!this.detected(lr)
+     * </pre>
+     *
+     * @param lr
+     */
+    public void undetectRobot(InstrumentedRobot lr) {
+        // if this robot was detected, then undetect
+        if (this.detected(lr)) {
+            SensorDataReceptorInterface sdr = this.sensors.remove(lr);
+            sdr.cutoff();
+            this.boards.remove(lr);
+            this.validate();
+        }
+    }
 
-	/**
-	 * create the sensor data receptor thread for the robot lr and connects it
-	 * to its teleoperation board.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param lr	the robot for which the thread must be created.
-	 * @param board	the teleoperation board of the robot lr.
-	 * @return
-	 */
-	public abstract SensorDataReceptorInterface createSensorDataReceptor(
-			InstrumentedRobot lr,
-			RobotTeleoperationBoard board
-			) ;
+    /**
+     * make a robot controllable by this control station when it enters its
+     * control area.  The button used to select this robot to control it is
+     * created and the teleoperation board associated to the robot is also
+     * connected to the sensor data receptor thread receiving the sensory
+     * data from the robot, as well as to the robot itself.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	this.detected(lr) && !this.controllable(lr)
+     * post	this.detected(lr) && this.controllable(lr)
+     * </pre>
+     *
+     * @param lr		the robot to be made controllable.
+     */
+    public void makeControllable(InstrumentedRobot lr) {
+        if (this.detected(lr) && !this.controllable(lr)) {
+            this.robotSelector.registerRobot(lr);
+            RobotTeleoperationBoard board = this.boards.get(lr);
+            SensorDataReceptorInterface sdr = this.sensors.get(lr);
+            sdr.setTBoard(board);
+            this.lowerBoard.add((Component) board, BorderLayout.WEST);
+            board.setVisible(true);
+            board.connectRobot(lr);
+            this.validate();
+        }
+    }
 
-	/**
-	 * makes a robot no longer visible from this teleoperation station when it
-	 * exits its visibility area.  The sensor data receptor thread for this
-	 * robot is deleted.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	this.detected(lr)
-	 * post	!this.detected(lr)
-	 * </pre>
-	 *
-	 * @param lr
-	 */
-	public void			undetectRobot(InstrumentedRobot lr) {
-		// if this robot was detected, then undetect
-		if (this.detected(lr)) {
-			SensorDataReceptorInterface sdr = this.sensors.remove(lr) ;
-			sdr.cutoff() ;
-			this.boards.remove(lr) ;
-			this.validate() ;
-		}
-	}
+    /**
+     * make a robot no longer controllable (but still visible) by this control
+     * station when it exits its control area.  The button used to select this
+     * robot to control it is deleted and the teleoperation board associated
+     * to the robot is also deleted.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	this.detected && this.controllable(lr)
+     * post	this.detected && !this.controllable(lr) &&
+     * 			lr != this.currentlySelected
+     * </pre>
+     *
+     * @param lr		the robot to make no longer controllable.
+     */
+    public void makeUncontrollable(InstrumentedRobot lr) {
+        if (this.controllable(lr)) {
+            this.robotSelector.unregisterRobot(lr);
+            SensorDataReceptorInterface sdr = this.sensors.get(lr);
+            sdr.setTBoard(null);
+            RobotTeleoperationBoard board = this.boards.get(lr);
+            board.setVisible(false);
+            board.disconnectRobot(lr);
+            this.lowerBoard.remove((Component) board);
+            if (lr == this.currentlySelected) {
+                this.currentlySelected = null;
+            }
+            this.validate();
+        }
+    }
 
-	/**
-	 * make a robot controllable by this control station when it enters its
-	 * control area.  The button used to select this robot to control it is
-	 * created and the teleoperation board associated to the robot is also
-	 * connected to the sensor data receptor thread receiving the sensory
-	 * data from the robot, as well as to the robot itself.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	this.detected(lr) && !this.controllable(lr)
-	 * post	this.detected(lr) && this.controllable(lr)
-	 * </pre>
-	 *
-	 * @param lr		the robot to be made controllable.
-	 */
-	public void			makeControllable(InstrumentedRobot lr) {
-		if (this.detected(lr) && !this.controllable(lr)) {
-			this.robotSelector.registerRobot(lr) ;
-			RobotTeleoperationBoard board = this.boards.get(lr) ;
-			SensorDataReceptorInterface sdr = this.sensors.get(lr) ;
-			sdr.setTBoard(board) ;
-			this.lowerBoard.add((Component)board, BorderLayout.WEST) ;
-			board.connectRobot(lr) ;
-			this.validate() ;
-		}
-	}
+    /**
+     * Make a robot the currently controlled robot through this teleoperation
+     * station.  The teleoperation board associated to the robot becomes the
+     * one visible in the lower panel of the station.  The teleoperation board
+     * of the currently controlled robot prior to this new selection is made
+     * invisible, but kept for further selection in the future.
+     * 
+     * <p><strong>Contract</strong></p>
+     * 
+     * <pre>
+     * pre	this.detected(lr) && this.controllable(lr)
+     * post	this.detected(lr) && this.controlled(lr) &&
+     * 			lr == this.currentlySelected
+     * </pre>
+     *
+     * @param lr	the robot to be selected.
+     */
+    public void selectRobot(InstrumentedRobot lr) {
+        RobotTeleoperationBoard board;
 
-	/**
-	 * make a robot no longer controllable (but still visible) by this control
-	 * station when it exits its control area.  The button used to select this
-	 * robot to control it is deleted and the teleoperation board associated
-	 * to the robot is also deleted.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	this.detected && this.controllable(lr)
-	 * post	this.detected && !this.controllable(lr) &&
-	 * 			lr != this.currentlySelected
-	 * </pre>
-	 *
-	 * @param lr		the robot to make no longer controllable.
-	 */
-	public void			makeUncontrollable(InstrumentedRobot lr) {
-		if (this.controllable(lr)) {
-			this.robotSelector.unregisterRobot(lr) ;
-			SensorDataReceptorInterface sdr = this.sensors.get(lr) ;
-			sdr.setTBoard(null) ;
-			RobotTeleoperationBoard board = this.boards.get(lr) ;
-			board.setVisible(false) ;
-			board.disconnectRobot(lr) ;
-			this.lowerBoard.remove((Component)board) ;
-			if (lr == this.currentlySelected) {
-				this.currentlySelected = null ;
-			}
-			this.validate() ;
-		}
-	}
-
-	/**
-	 * Make a robot the currently controlled robot through this teleoperation
-	 * station.  The teleoperation board associated to the robot becomes the
-	 * one visible in the lower panel of the station.  The teleoperation board
-	 * of the currently controlled robot prior to this new selection is made
-	 * invisible, but kept for further selection in the future.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	this.detected(lr) && this.controllable(lr)
-	 * post	this.detected(lr) && this.controlled(lr) &&
-	 * 			lr == this.currentlySelected
-	 * </pre>
-	 *
-	 * @param lr	the robot to be selected.
-	 */
-	public void			selectRobot(InstrumentedRobot lr) {
-		RobotTeleoperationBoard board ;
-
-		if (lr != this.currentlySelected) {
-			if (this.currentlySelected != null) {
-				board = this.boards.get(this.currentlySelected) ;
-				if (board != null) {
-					board.setVisible(false) ;
-				}
-			}
-			board = this.boards.get(lr) ;
-			board.setVisible(true) ;
-			this.currentlySelected = lr ;
-			this.validate() ;
-		}
-	}
+        if (lr != this.currentlySelected) {
+            if (this.currentlySelected != null) {
+                board = this.boards.get(this.currentlySelected);
+                if (board != null) {
+                    board.setVisible(false);
+                }
+            }
+            board = this.boards.get(lr);
+            board.setVisible(true);
+            this.currentlySelected = lr;
+            this.validate();
+        }
+    }
 }
 
 // $Id$

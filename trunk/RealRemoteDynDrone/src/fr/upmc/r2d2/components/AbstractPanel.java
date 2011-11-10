@@ -30,7 +30,8 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
         setSize(450, 125);
         setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
         
-        add(createComponent(), BorderLayout.NORTH);
+        component = createComponent();
+        add(component, BorderLayout.NORTH);
         
         JLabel displayLabel = new JLabel(createTitle());
         JPanel labelPane = new JPanel();

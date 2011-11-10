@@ -14,8 +14,10 @@ import fr.upmc.r2d2.tools.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -37,12 +39,10 @@ public class MainJavassist_2 {
     
     public static void main(String[] args) throws Throwable {
         LOADER.addTranslator(robotTranslator, "@fr.upmc.dtgui.annotations.WithSensors");
-//        LOADER.addTranslator(new RobotWithActuatorsTranslator(), "@fr.upmc.dtgui.annotations.WithActuators");
-        // LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
         LOADER.addTranslator(guiTranslator, "fr.upmc.r2d2.boards.DynGUI");
         
-        LOADER.run("fr.upmc.r2d2.mains.MainTests");
-        //LOADER.run("fr.upmc.r2d2.tests.MainTests");
+        //LOADER.run("fr.upmc.r2d2.mains.MainTests");
+        LOADER.run("fr.upmc.r2d2.WorldTests");
     }
 
     private static class GuiTranslator implements AssistantLoader.ISimpleTranslator  {
@@ -55,6 +55,7 @@ public class MainJavassist_2 {
                     .append(".class, new ")
                     .append(robotType)
                     .append(TBOARD_EXT + "(this, sizeX - 50));");
+            System.out.println("> add board " + robotType);
         }
         
         /**
@@ -71,7 +72,9 @@ public class MainJavassist_2 {
 
                 @Override
                 public void run() throws Exception {
+                    System.out.println(boards);
                     cc.getConstructors()[0].insertAfter(boards.toString());
+                    cc.writeFile();
                 }
             });
 
@@ -214,12 +217,12 @@ public class MainJavassist_2 {
         }
 
         private void processAnnotation(String groupName, String name, String type) {
-            tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.MessageData(\"" + groupName + "\",\"" + name + "\", new " + type + "(robot." + name + "())));"));
+            tmpQueue.append(("dataQueue.add(new MessageData(\"" + groupName + "\",\"" + name + "\", new " + type + "(robot." + name + "())));"));
         }
         
         private void processGroup(String groupName, String component) {
             if (!groupPanels.containsKey(groupName))
-                groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel("+ groupName +");"));
+                groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel(\""+ groupName +"\");"));
             
             groupPanels.get(groupName)
                     .append("addComponent(")
@@ -237,7 +240,7 @@ public class MainJavassist_2 {
             processAnnotation(sensor.groupName(), name, "Double");
             /* String groupName, String methodName, double minRate, double maxRate, String unit, double minRange, double maxRange, VariationType variation */
             processGroup(sensor.groupName(), 
-                    String.format("RealDisplayPanel(\"%1$s\", \"%2$s\", %3$f, %4$f, \"%5$s\", %6$f, %7$f, VariationType.%8%s)", 
+                    String.format(Locale.US, "RealDisplayPanel(\"%s\", \"%s\", %f, %f, \"%s\", %f, %f, VariationType.%s)", 
                     sensor.groupName(),
                     name, 
                     sensor.minReadingRate(),
@@ -276,7 +279,7 @@ public class MainJavassist_2 {
         public void processAnnotation(CtMethod m, String name, RealActuatorData sensor) {
             /* String groupName, String methodName, double minWritingRate, double maxWritingRate, String unit, double minRange, double maxRange */
             processGroup(sensor.groupName(), 
-                    String.format("RealControllerPanel(\"%1$s\", \"%2$s\", %3$f, %4$f, \"%5$s\", %6$f, %7$f)", 
+                    String.format(Locale.US, "RealControllerPanel(\"%s\", \"%s\", %f, %f, \"%s\", %f, %f)", 
                     sensor.groupName(),
                     name, 
                     sensor.minWritingRate(),
@@ -309,7 +312,8 @@ public class MainJavassist_2 {
 
             try {
                 process = getClass().getMethod("processAnnotation", CtMethod.class, String.class, a.annotationType());
-            } catch (Throwable ex) {
+            } catch (NoSuchMethodException | SecurityException ex) {
+                Utils.log("Il n'existe pas de traitement associé à "+ a.annotationType().getName() +" : "+ ex.getMessage());
                 return;
             } // si on ne trouve pas la méthode tant pis, pas besoin de faire remonter d'exception
 
@@ -361,10 +365,14 @@ public class MainJavassist_2 {
             /* Création de la SensorQueue du robot */
             
             dataSender = makeDataQueue(SENDER_EXT, sensors.size());
+            dataSender.getClassPool().importPackage("fr.upmc.r2d2.robots.MessageData");
+            
             dataSender.addField(CtField.make("private int sleep = 100;", dataSender));
 
             // construction du code des méthodes et constructeurs
             String run = Utils.readSnippet(SENDER_EXT + ".run").replaceFirst("#TMPQUEUE#", tmpQueue.toString());
+            
+            Utils.log(run);
 
             // ajout des méthodes
             dataSender.addMethod(CtMethod.make(Utils.readSnippet(SENDER_EXT + ".start"), dataSender));
@@ -379,15 +387,18 @@ public class MainJavassist_2 {
             robot.addField(CtField.make("private " + robot.getName() + SENDER_EXT + " sds;", robot));
             robot.getDeclaredMethod("start").insertBefore("sds.start();");
             robot.addMethod(CtMethod.make(Utils.readSnippet("Robot.getSensorDataQueue"), robot));
-            robot.getConstructors()[0].insertAfter("sds = new " + robot.getName() + SENDER_EXT + "(this);");
+            robot.getConstructors()[0].insertAfter("sds = new " + robot.getName() + SENDER_EXT + "($0);");
         }
 
         public void makeActuators() throws Exception {
             dataReceptor = makeDataQueue(RECEPTOR_EXT, 1);
+            
+            dataReceptor.getClassPool().importPackage("fr.upmc.r2d2.robots.ActuatorCommand");
+            dataReceptor.getClassPool().importPackage("fr.upmc.r2d2.robots.MessageData");
 
             // ajout des méthodes
-            dataSender.addMethod(CtMethod.make(Utils.readSnippet(RECEPTOR_EXT + ".start"), dataSender));
-            dataSender.addMethod(CtMethod.make(Utils.readSnippet(RECEPTOR_EXT + ".run"), dataSender));         
+            dataReceptor.addMethod(CtMethod.make(Utils.readSnippet(RECEPTOR_EXT + ".start"), dataReceptor));
+            dataReceptor.addMethod(CtMethod.make(Utils.readSnippet(RECEPTOR_EXT + ".run"), dataReceptor));         
             
             dataReceptor.writeFile();
 
@@ -398,7 +409,8 @@ public class MainJavassist_2 {
             robot.addField(CtField.make("private " + robot.getName() + RECEPTOR_EXT + " adr;", robot));
             robot.getDeclaredMethod("start").insertBefore("adr.start();");
             robot.addMethod(CtMethod.make(Utils.readSnippet("Robot.getActuatorDataQueue"), robot));
-            robot.getConstructors()[0].insertAfter("adr = new " + robot.getName() + RECEPTOR_EXT + "(this);");
+            robot.getDeclaredMethod("getActuatorDataQueue").setModifiers(Modifier.ABSTRACT); 
+            robot.getConstructors()[0].insertAfter("adr = new " + robot.getName() + RECEPTOR_EXT + "($0);");
         }
         
         /**
@@ -407,12 +419,18 @@ public class MainJavassist_2 {
         public void makeBoard() throws Exception {
             guiTranslator.addBoard(robot.getName());
             
-            CtClass board = pool.makeClass(robot.getName() + GuiTranslator.TBOARD_EXT, LOADER.getCtClass(pool, "Abstract" + GuiTranslator.TBOARD_EXT));
+            CtClass board = pool.makeClass(robot.getName() + GuiTranslator.TBOARD_EXT, LOADER.getCtClass(pool, "fr.upmc.r2d2.boards.Abstract" + GuiTranslator.TBOARD_EXT));
+            board.getClassPool().importPackage("fr.upmc.r2d2.boards.GroupPanel");
+            board.getClassPool().importPackage("fr.upmc.r2d2.components.displays");
+            board.getClassPool().importPackage("fr.upmc.r2d2.components.controllers");
+            board.getClassPool().importPackage("fr.upmc.dtgui.annotations.VariationType");
             
             StringBuilder gpanels = new StringBuilder();
             
             for(StringBuffer gpanel : groupPanels.values())
                 gpanels.append(gpanel.toString());
+            
+            Utils.log(gpanels.toString());
             
             board.addMethod(CtMethod.make("public void createPanels() { "+ gpanels.toString() +" }", board));
             board.writeFile();
@@ -448,8 +466,11 @@ public class MainJavassist_2 {
             dataQueue.addField(CtField.make("private " + robot.getName() + " robot;", dataQueue));
 
             CtConstructor cons = new CtConstructor(new CtClass[]{robot}, dataQueue);
+            
             cons.callsSuper();
-            cons.setBody("this.robot = robot;");
+            cons.setBody("this.robot = $1;");
+            
+            
             dataQueue.addConstructor(cons);
 
             return dataQueue;
