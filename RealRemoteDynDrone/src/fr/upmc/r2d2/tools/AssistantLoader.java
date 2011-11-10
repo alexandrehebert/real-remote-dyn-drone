@@ -20,14 +20,14 @@ import javassist.Translator;
 public class AssistantLoader extends Loader {
     
     private ClassPool p = ClassPool.getDefault();
-    private Map<Translator, List<String>> translators = new HashMap<Translator, List<String>>();
-    private Map<String, CtClass> ctCache = new HashMap<String, CtClass>();
+    private Map<Translator, List<String>> translators = new HashMap();
+    private Map<String, CtClass> ctCache = new HashMap();
     
     public AssistantLoader() {
         super(ClassPool.getDefault());
         try {
             addTranslator(p, new DispatchTranslator());
-        } catch (Exception e) {
+        } catch (NotFoundException | CannotCompileException e) {
             Utils.print(e);
         }
     }

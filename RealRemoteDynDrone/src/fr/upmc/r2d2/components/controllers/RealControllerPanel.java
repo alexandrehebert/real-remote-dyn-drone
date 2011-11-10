@@ -1,7 +1,7 @@
 package fr.upmc.r2d2.components.controllers;
 
 import fr.upmc.r2d2.components.AbstractControllerPanel;
-import fr.upmc.r2d2.tboards.AbstractTeleoperationBoard.ActuatorDataSender;
+import fr.upmc.r2d2.boards.AbstractTeleoperationBoard.ActuatorDataSender;
 import fr.upmc.r2d2.components.JComponentFactory;
 import fr.upmc.r2d2.tools.MessageData;
 import java.util.EventListener;
