@@ -14,8 +14,8 @@ public abstract class AbstractControllerPanel<J extends JComponent> extends Abst
     protected EventListener el;
     protected InstrumentedRobot r;
 
-    public AbstractControllerPanel() {
-        super();
+    public AbstractControllerPanel(String groupName, String methodName, double minRate, double maxRate) {
+        super(groupName, methodName, minRate, maxRate);
     }
 
     public void disconnectRobot() {

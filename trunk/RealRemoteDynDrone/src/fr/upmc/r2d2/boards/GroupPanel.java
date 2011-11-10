@@ -12,7 +12,7 @@ public class GroupPanel extends JPanel {
 
     protected int height = 0, width = 100;
 
-    public GroupPanel(String name, int w, int h) {
+    public GroupPanel(String name) {
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JLabel displayLabel = new JLabel(name);
@@ -23,9 +23,10 @@ public class GroupPanel extends JPanel {
         this.setVisible(true);
     }
 
-    protected final void addComponent(JPanel p) {
-        this.adjust(p);
-        this.add(p);
+    protected final GroupPanel addComponent(JPanel p) {
+        adjust(p);
+        add(p);
+        return this;
     }
 
     private void adjust(JPanel p) {

@@ -50,7 +50,11 @@ public class MainJavassist_2 {
         private StringBuffer boards = new StringBuffer();
         
         public void addBoard(String robotType) {
-            boards.append("boards.put("+robotType+".class, new " + robotType + TBOARD_EXT + "(this, sizeX - 50));");
+            boards.append("boards.put(")
+                    .append(robotType)
+                    .append(".class, new ")
+                    .append(robotType)
+                    .append(TBOARD_EXT + "(this, sizeX - 50));");
         }
         
         /**
@@ -193,6 +197,7 @@ public class MainJavassist_2 {
         private StringBuffer tmpQueue = new StringBuffer();
         private Map<CtMethod, Annotation> sensors = new HashMap(), 
                 actuators = new HashMap();
+        private Map<String, StringBuffer> groupPanels = new HashMap();
         private CtClass robot;
         private CtClass dataSender;
         private CtClass dataReceptor;
@@ -211,6 +216,18 @@ public class MainJavassist_2 {
         private void processAnnotation(String groupName, String name, String type) {
             tmpQueue.append(("dataQueue.add(new fr.upmc.r2d2.tools.MessageData(\"" + groupName + "\",\"" + name + "\", new " + type + "(robot." + name + "())));"));
         }
+        
+        private void processGroup(String groupName, String component) {
+            if (!groupPanels.containsKey(groupName))
+                groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel("+ groupName +");"));
+            
+            groupPanels.get(groupName)
+                    .append("addComponent(")
+                    .append(groupName)
+                    .append(", new ")
+                    .append(component)
+                    .append(");");
+        }
 
         /*******************************************************
          * SENSORS
@@ -218,12 +235,36 @@ public class MainJavassist_2 {
         
         public void processAnnotation(CtMethod m, String name, RealSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Double");
+            /* String groupName, String methodName, double minRate, double maxRate, String unit, double minRange, double maxRange, VariationType variation */
+            processGroup(sensor.groupName(), 
+                    String.format("RealDisplayPanel(\"%1$s\", \"%2$s\", %3$f, %4$f, \"%5$s\", %6$f, %7$f, VariationType.%8%s)", 
+                    sensor.groupName(),
+                    name, 
+                    sensor.minReadingRate(),
+                    sensor.maxReadingRate(),
+                    sensor.unit().name(),
+                    sensor.dataRange().inf(),
+                    sensor.dataRange().sup(),
+                    sensor.variation().toString()
+            ));
         }
 
+        /**
+         * @TODO
+         * @param m
+         * @param name
+         * @param sensor 
+         */
         public void processAnnotation(CtMethod m, String name, IntegerSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Integer");
         }
         
+        /**
+         * @TODO
+         * @param m
+         * @param name
+         * @param sensor 
+         */        
         public void processAnnotation(CtMethod m, String name, BooleanSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Boolean");
         }
@@ -233,7 +274,17 @@ public class MainJavassist_2 {
          *******************************************************/
         
         public void processAnnotation(CtMethod m, String name, RealActuatorData sensor) {
-            /* Pour le TBoard */
+            /* String groupName, String methodName, double minWritingRate, double maxWritingRate, String unit, double minRange, double maxRange */
+            processGroup(sensor.groupName(), 
+                    String.format("RealControllerPanel(\"%1$s\", \"%2$s\", %3$f, %4$f, \"%5$s\", %6$f, %7$f)", 
+                    sensor.groupName(),
+                    name, 
+                    sensor.minWritingRate(),
+                    sensor.maxWritingRate(),
+                    sensor.unit().name(),
+                    sensor.dataRange().inf(),
+                    sensor.dataRange().sup()
+            ));
         }
         
         public void processAnnotation(CtMethod m, String name, IntegerActuatorData sensor) {
@@ -303,6 +354,7 @@ public class MainJavassist_2 {
             robot.writeFile();
             
             /* créer le tboard associé */
+            makeBoard();
         }
 
         public void makeSensors() throws Exception {
@@ -352,10 +404,18 @@ public class MainJavassist_2 {
         /**
          * Création de la classe TeleoperationBoard associé à ce type de robot
          */
-        public void makeBoard() {
+        public void makeBoard() throws Exception {
             guiTranslator.addBoard(robot.getName());
             
+            CtClass board = pool.makeClass(robot.getName() + GuiTranslator.TBOARD_EXT, LOADER.getCtClass(pool, "Abstract" + GuiTranslator.TBOARD_EXT));
             
+            StringBuilder gpanels = new StringBuilder();
+            
+            for(StringBuffer gpanel : groupPanels.values())
+                gpanels.append(gpanel.toString());
+            
+            board.addMethod(CtMethod.make("public void createPanels() { "+ gpanels.toString() +" }", board));
+            board.writeFile();
         }
         
         /*******************************************************

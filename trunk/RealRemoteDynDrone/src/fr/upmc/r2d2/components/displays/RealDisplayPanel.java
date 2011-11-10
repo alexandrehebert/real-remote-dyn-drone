@@ -14,14 +14,16 @@ public class RealDisplayPanel extends AbstractDisplayPanel<JSlider> {
     /**
      * Informations des annotations
      */
-    private String groupName, methodName;
     private String unit;
-    private int minRange, maxRange;
-    private int minReadingRate, maxReadingRate;
+    private double minRange, maxRange;
     private VariationType variation;
     
-    public RealDisplayPanel() {
-        super();
+    public RealDisplayPanel(String groupName, String methodName, double minRate, double maxRate, String unit, double minRange, double maxRange, VariationType variation) {
+        super(groupName, methodName, minRate, maxRate);
+        this.unit = unit;
+        this.minRange = minRange;
+        this.maxRange = maxRange;
+        this.variation = variation;
     }
     
     @Override
@@ -39,12 +41,10 @@ public class RealDisplayPanel extends AbstractDisplayPanel<JSlider> {
     }
 
     /**
-     * @TODO A machiner dans javassist
      * @return 
      */
-    @Override
     public String createTitle() {
-        return "";
+        return super.createTitle() + " (" + unit + ")";
     }
     
 }

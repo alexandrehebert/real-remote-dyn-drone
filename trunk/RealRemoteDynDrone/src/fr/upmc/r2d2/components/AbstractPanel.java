@@ -14,9 +14,17 @@ import javax.swing.JPanel;
 public abstract class AbstractPanel<J extends JComponent> extends JPanel {
     
     protected J component;
+    private String groupName;
+    private String methodName;
+    protected double minRate, maxRate;    
     
-    public AbstractPanel() {
+    public AbstractPanel(String groupName, String methodName, double minRate, double maxRate) {
         super();
+        
+        this.groupName = groupName;
+        this.methodName = methodName;
+        this.minRate = minRate;
+        this.maxRate = maxRate;
         
         setLayout(new BorderLayout());
         setSize(450, 125);
@@ -33,12 +41,28 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
     }
     
     @Override
-    public void setVisible(boolean aFlag) {
+    public final void setVisible(boolean aFlag) {
         super.setVisible(aFlag);
         component.setVisible(aFlag);
     }
 
-    public abstract J createComponent();
-    public abstract String createTitle();
+    public String createTitle() {
+        return getMethodName().substring(3);
+    }
     
+    public abstract J createComponent();
+
+    /**
+     * @return the groupName
+     */
+    public String getGroupName() {
+        return groupName;
+    }
+
+    /**
+     * @return the methodName
+     */
+    public String getMethodName() {
+        return methodName;
+    }
 }

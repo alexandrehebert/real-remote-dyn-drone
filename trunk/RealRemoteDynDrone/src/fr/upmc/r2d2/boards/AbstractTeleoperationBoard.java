@@ -24,7 +24,9 @@ import fr.upmc.dtgui.robot.PositioningData;
 import fr.upmc.dtgui.robot.Robot;
 import fr.upmc.dtgui.robot.RobotStateData;
 import fr.upmc.r2d2.tools.MessageData;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * The class <code>RobotTeleoperationBoard</code> implements a teleoperation
@@ -56,7 +58,7 @@ public abstract class AbstractTeleoperationBoard
     protected TeleoperationGUI tgui;
     protected Robot lr;
     
-    protected GroupPanel[] panels;    
+    protected List<GroupPanel> panels = new ArrayList();    
     protected final HashMap<String, AbstractDisplayPanel> displays = new HashMap();
     protected final HashMap<String, AbstractControllerPanel> controllers = new HashMap();
 
@@ -69,11 +71,43 @@ public abstract class AbstractTeleoperationBoard
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
-        for (GroupPanel jp : (panels = getPanels())) {
-            this.add(jp);
+        createPanels();
+        
+        for (GroupPanel jp : panels) {
+            add(jp);
         }
         
         this.setVisible(false);
+    }
+    
+    protected GroupPanel addGroup(String name) {
+        GroupPanel gp = new GroupPanel(name);
+        panels.add(gp);
+        return gp;
+    }
+    
+    protected abstract void createPanels();
+    /* 
+     * GroupPanel group1 = addGroup("...");
+     * 
+     * addComponent(group, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
+     * addComponent(group, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
+     * 
+     * GroupPanel group2 = addGroup("...");
+     * 
+     * addComponent(groupName, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
+     * addComponent(groupName, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
+     * };
+     */
+    
+    protected void addComponent(GroupPanel gp, AbstractDisplayPanel adp) {
+        gp.addComponent(adp);
+        displays.put(adp.getMethodName(), adp);
+    }
+    
+    protected void addComponent(GroupPanel gp, AbstractControllerPanel adp) {
+        gp.addComponent(adp);
+        controllers.put(adp.getMethodName(), adp);
     }
 
     /**
@@ -81,6 +115,8 @@ public abstract class AbstractTeleoperationBoard
      * @return 
      */
     public abstract GroupPanel[] getPanels();
+    
+
 
     @Override
     protected void paintComponent(Graphics g) {

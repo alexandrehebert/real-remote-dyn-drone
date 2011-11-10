@@ -20,21 +20,23 @@ public class RealControllerPanel extends AbstractControllerPanel<JSlider> {
     /**
      * Informations des annotations
      */
-    private String groupName, methodName;
     private String unit;
-    private int minRange, maxRange;
-    private int minWritingRate, maxWritingRate;
+    private double minRange, maxRange;
     
-    public RealControllerPanel(String label) {
-        super();
+    public RealControllerPanel(String groupName, String methodName, double minWritingRate, double maxWritingRate, String unit, double minRange, double maxRange) {
+        super(groupName, methodName, minWritingRate, maxWritingRate);
+        
+        this.unit = unit;
+        this.minRange = minRange;
+        this.maxRange = maxRange;
+        
     }
 
     /**
-     * @TODO A générer avec Javassist
      * @return 
      */
     public String createTitle() {
-        return "";
+        return super.createTitle() + " (" + unit + ")";
     }
     
     public JSlider createComponent() {
@@ -47,7 +49,7 @@ public class RealControllerPanel extends AbstractControllerPanel<JSlider> {
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
 
-                MessageData sc = new MessageData(methodName, source.getValue());
+                MessageData sc = new MessageData(getMethodName(), source.getValue());
                         
                 (new ActuatorDataSender(sc, bq)).start();
             }

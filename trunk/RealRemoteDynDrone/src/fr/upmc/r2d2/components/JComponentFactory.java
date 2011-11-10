@@ -9,8 +9,8 @@ import javax.swing.JSlider;
  */
 public class JComponentFactory {
     
-    public static JSlider makeSlider(int minRange, int maxRange) {
-        DefaultBoundedRangeModel model = new DefaultBoundedRangeModel(0, 0, minRange, maxRange);   
+    public static JSlider makeSlider(double minRange, double maxRange) {
+        DefaultBoundedRangeModel model = new DefaultBoundedRangeModel(0, 0, (int) minRange, (int) maxRange);   
         JSlider js = new JSlider(model);
         
         js.setOrientation(JSlider.VERTICAL);
