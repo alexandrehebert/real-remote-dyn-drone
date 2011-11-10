@@ -31,14 +31,47 @@ public class MainJavassist_2 {
 
     private static final WalkAnnotations WALKER = new WalkAnnotations();
     private static final AssistantLoader LOADER = new AssistantLoader();
-
+    
+    private static GuiTranslator guiTranslator = new GuiTranslator();
+    private static RobotTranslator robotTranslator = new RobotTranslator();
+    
     public static void main(String[] args) throws Throwable {
-        LOADER.addTranslator(new RobotTranslator(), "@fr.upmc.dtgui.annotations.WithSensors");
+        LOADER.addTranslator(robotTranslator, "@fr.upmc.dtgui.annotations.WithSensors");
 //        LOADER.addTranslator(new RobotWithActuatorsTranslator(), "@fr.upmc.dtgui.annotations.WithActuators");
         // LOADER.addTranslator(new RobotTranslator(), "fr.upmc.dtgui.robot.Robot");
-        LOADER.addTranslator(new WorldTranslator(), "fr.upmc.dtgui.example.World");
+        LOADER.addTranslator(guiTranslator, "fr.upmc.r2d2.boards.DynGUI");
+        
         LOADER.run("fr.upmc.r2d2.mains.MainTests");
         //LOADER.run("fr.upmc.r2d2.tests.MainTests");
+    }
+
+    private static class GuiTranslator implements AssistantLoader.ISimpleTranslator  {
+        public static final String TBOARD_EXT = "TeleoperationBoard";
+        private StringBuffer boards = new StringBuffer();
+        
+        public void addBoard(String robotType) {
+            boards.append("boards.put("+robotType+".class, new " + robotType + TBOARD_EXT + "(this, sizeX - 50));");
+        }
+        
+        /**
+         * Méthode appelée pour chaque classe annotée par WithSensors
+         * 
+         * @param cp
+         * @param string
+         * @param cc CtClass de Robot
+         * @throws Exception 
+         */
+        @Override
+        public void onLoad(ClassPool cp, String string, final CtClass cc) throws Exception {
+            Utils.block(cc.getSimpleName(), new Utils.Block() {
+
+                @Override
+                public void run() throws Exception {
+                    cc.getConstructors()[0].insertAfter(boards.toString());
+                }
+            });
+
+        }        
     }
 
     /**
@@ -314,6 +347,15 @@ public class MainJavassist_2 {
             robot.getDeclaredMethod("start").insertBefore("adr.start();");
             robot.addMethod(CtMethod.make(Utils.readSnippet("Robot.getActuatorDataQueue"), robot));
             robot.getConstructors()[0].insertAfter("adr = new " + robot.getName() + RECEPTOR_EXT + "(this);");
+        }
+        
+        /**
+         * Création de la classe TeleoperationBoard associé à ce type de robot
+         */
+        public void makeBoard() {
+            guiTranslator.addBoard(robot.getName());
+            
+            
         }
         
         /*******************************************************
