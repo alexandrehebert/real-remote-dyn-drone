@@ -109,12 +109,6 @@ public abstract class AbstractTeleoperationBoard
         gp.addComponent(adp);
         controllers.put(adp.getMethodName(), adp);
     }
-
-    /**
-     * A générer par javassist
-     * @return 
-     */
-    public abstract GroupPanel[] getPanels();
     
 
 
@@ -241,7 +235,7 @@ public abstract class AbstractTeleoperationBoard
         @Override
         public void run() {
             if (displays.isEmpty()) {
-                System.out.println("Display empty");
+                System.out.println("$ nothing to display");
                 return;
             }
             
@@ -332,7 +326,6 @@ public abstract class AbstractTeleoperationBoard
             try {
                 SwingUtilities.invokeAndWait(
                         new Runnable() {
-
                             public void run() {
                                 commandQueue.clear();
                                 commandQueue.add(rac);

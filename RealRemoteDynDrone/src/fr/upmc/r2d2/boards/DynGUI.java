@@ -48,7 +48,7 @@ public class DynGUI extends TeleoperationGUI {
     public RobotTeleoperationBoard checkBoard(Class<? extends Robot> r) {
         if (!boards.containsKey(r)) {
             // TODO: create an exception type
-            System.out.println("Unknown type of robot : "
+            System.out.println("$ unknown type of robot : "
                     + r.getCanonicalName());
             System.exit(1);
         }

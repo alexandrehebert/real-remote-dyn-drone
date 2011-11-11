@@ -15,7 +15,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,16 +48,19 @@ public class MainJavassist_2 {
     }
 
     private static class GuiTranslator implements AssistantLoader.ISimpleTranslator  {
+        
         public static final String TBOARD_EXT = "TeleoperationBoard";
         private StringBuffer boards = new StringBuffer();
+        private String debug = "";
         
         public void addBoard(String robotType) {
             boards.append("boards.put(")
                     .append(robotType)
                     .append(".class, new ")
                     .append(robotType)
-                    .append(TBOARD_EXT + "(this, sizeX - 50));");
-            System.out.println("> add board " + robotType);
+                    .append(TBOARD_EXT + "(this, sizeX - 50));\n");
+            System.out.println("> create board :\n\t" + robotType + TBOARD_EXT);
+            debug += "\tboard " + robotType + "\n";
         }
         
         /**
@@ -68,14 +73,18 @@ public class MainJavassist_2 {
          */
         @Override
         public void onLoad(ClassPool cp, String string, final CtClass cc) throws Exception {
+            
             Utils.block(cc.getSimpleName(), new Utils.Block() {
-
+                
                 @Override
                 public void run() throws Exception {
-                    System.out.println(boards);
+                    
+                    System.out.println("> process boards :\n" + debug + "> inserting code in DynGUI");
+                    Utils.log(boards.toString());
                     cc.getConstructors()[0].insertAfter(boards.toString());
                     cc.writeFile();
                 }
+                
             });
 
         }        
@@ -109,14 +118,22 @@ public class MainJavassist_2 {
                             new Class[]{Makeable.class},
                             new RobotMaker(cc));
 
+                    /**
+                     * On parcours la liste des annotations de chaque méthode
+                     */
                     WALKER.walk(cc, new WalkAnnotations.IAnnotationWalker() {
-
-                        @Override
                         public void walk(CtMethod m, Annotation a) throws Exception {
+                            /**
+                             * On cherche à résoudre l'annotation dans la liste de nos
+                             * méthodes de traitement
+                             */
                             maker.processAnnotation(m, m.getName()/*.substring(3)*/, a);
                         }
                     });
 
+                    /**
+                     * On fabrique le robot final
+                     */
                     maker.make();
                 }
                 
@@ -136,7 +153,6 @@ public class MainJavassist_2 {
          * Il s'agit donc du handler d'annotations
          */
         public interface IAnnotationWalker {
-
             public void walk(CtMethod m, Annotation a) throws Exception;
         }
 
@@ -193,7 +209,7 @@ public class MainJavassist_2 {
 
     /**
      * La Frabrique de robot est la classe qui est chargée d'aggréger l'ensemble des
-     * traitements qu'il nous sera possible pour telle ou telle annotation trouvée
+     * traitements qu'il nous faudra effectuer pour telle ou telle annotation trouvée
      * qu'elle soit de type Sensor ou Actuator
      */
     public static class RobotMaker implements Makeable {
@@ -217,14 +233,30 @@ public class MainJavassist_2 {
             System.out.println("> process annotations :");
         }
 
+        /**
+         * Ajoute le bout de code généré au tampon de code qui sera ajouté
+         * dans la classe XXXSensorDataSender
+         * 
+         * @param groupName
+         * @param name
+         * @param type 
+         */
         private void processAnnotation(String groupName, String name, String type) {
             tmpQueue.append(("dataQueue.add(new MessageData(\"" + groupName + "\",\"" + name + "\", new " + type + "(robot." + name + "())));"));
         }
         
+        /**
+         * Ajoute le groupe trouvé à la liste des groupes de panneaux qui seront
+         * ajouté dans le TBoard du robot
+         * 
+         * @param groupName
+         * @param component 
+         */
         private void processGroup(String groupName, String component) {
             if (!groupPanels.containsKey(groupName)) {
                 groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel(\""+ groupName +"\");"
                         + "panels.add(" + groupName + ");"));
+                System.out.println("\tgroup " + groupName);
             }
             
             groupPanels.get(groupName)
@@ -263,6 +295,9 @@ public class MainJavassist_2 {
          */
         public void processAnnotation(CtMethod m, String name, IntegerSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Integer");
+            /**
+             * @TODO générer les bons displays
+             */
         }
         
         /**
@@ -273,6 +308,9 @@ public class MainJavassist_2 {
          */        
         public void processAnnotation(CtMethod m, String name, BooleanSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Boolean");
+            /**
+             * @TODO générer les bons displays
+             */
         }
         
         /*******************************************************
@@ -294,15 +332,23 @@ public class MainJavassist_2 {
         }
         
         public void processAnnotation(CtMethod m, String name, IntegerActuatorData sensor) {
-            /* Pour le TBoard */
+            /**
+             * @TODO générer les bons controllers
+             */
         }
         
         public void processAnnotation(CtMethod m, String name, BooleanActuatorData sensor) {
-            /* Pour le TBoard */
+            /**
+             * @TODO générer les bons controllers
+             */
         }    
         
        /**
          * On cherche, pour une annotation donnée, la méthode qui la traite
+         * Exemple : 
+         *  Ainsi, pour l'annotation RealSensorData, par reflexion on va chercher la 
+         *  méthode de signature "public void processAnnotation(CtMethod m, String name, RealSensorData sensor)"
+         *  et lui faire executer le job
          * 
          * @param m
          * @param name
@@ -364,6 +410,11 @@ public class MainJavassist_2 {
             makeBoard();
         }
 
+        /**
+         * On a recensé l'ensemble des sensors, on peut générer le code en conséquence
+         * 
+         * @throws Exception 
+         */
         public void makeSensors() throws Exception {
             /* Création de la SensorQueue du robot */
             
@@ -393,6 +444,11 @@ public class MainJavassist_2 {
             robot.getConstructors()[0].insertAfter("sds = new " + robot.getName() + SENDER_EXT + "($0);");
         }
 
+        /**
+         * On a recensé l'ensemble des actuators, on peut générer le code en conséquence
+         * 
+         * @throws Exception 
+         */
         public void makeActuators() throws Exception {
             dataReceptor = makeDataQueue(RECEPTOR_EXT, 1);
             
@@ -484,6 +540,16 @@ public class MainJavassist_2 {
          * Debug
          *******************************************************/        
 
+        /**
+         * Uniquement dans le but d'attraper les appels au make et ainsi de
+         * faire du déboguage
+         * 
+         * @param proxy
+         * @param method
+         * @param args
+         * @return
+         * @throws Throwable 
+         */
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getName().equals("make")) {
@@ -494,7 +560,8 @@ public class MainJavassist_2 {
         }
     }
 
-    private static class WorldTranslator implements AssistantLoader.ISimpleTranslator {
+    /*
+     * private static class WorldTranslator implements AssistantLoader.ISimpleTranslator {
 
         @Override
         public void onLoad(ClassPool cp, String string, CtClass c) throws Exception {
@@ -507,4 +574,7 @@ public class MainJavassist_2 {
             });
         }
     }
+     * 
+     */
+    
 }

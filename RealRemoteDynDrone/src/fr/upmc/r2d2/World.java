@@ -69,7 +69,7 @@ public class World extends Thread {
         this.instrumentedRobots = new InstrumentedRobot[]{
             /*double x, double y, double direction */
             RobotFactory.make(LittleRobot.class, "No 001", 2000.0, 950.0, 45.0),
-            //RobotFactory.make(AnotherLittleRobot.class, "No 002", 2850.0, 950.0, 135.0, 20.0)
+            RobotFactory.make(AnotherLittleRobot.class, "No 002", 2850.0, 950.0, 135.0, 20.0)
         };
     }
 
@@ -79,19 +79,19 @@ public class World extends Thread {
             new DynGUI("2", 3500, 1500, 500, 500, 400, 1000, 1000)
         };
     }
-
+    
     public void start() {
         super.start();
         for (int i = 0; i < this.teleoperationStations.length; i++) {
             this.teleoperationStations[i].start();
-            System.out.println(this.teleoperationStations[i].getName() + " running");
+            System.out.println("$ station '" + this.teleoperationStations[i].getTitle() + "' running");
         }
         for (int i = 0; i < this.instrumentedRobots.length; i++) {
             this.instrumentedRobots[i].start();
-            System.out.println(this.instrumentedRobots[i].getRobotName() + " running");
+            System.out.println("$ robot '" + this.instrumentedRobots[i].getRobotName() + "' running");
         }
     }
-
+    
     public void run() {
         while (true) {
             for (int i = 0; i < this.instrumentedRobots.length; i++) {
@@ -122,7 +122,7 @@ public class World extends Thread {
                                     new Runnable() {
                                         public void run() {
                                             if (!tgui.detected(lr))
-                                                System.out.println("$ Run detection robot : " + lr.getRobotName());
+                                                System.out.println("$ detect robot : '" + lr.getRobotName() + "' on '" + tgui.getTitle() + "'");
                                             tgui.detectRobot(lr);
                                         }
                                     });
@@ -137,7 +137,7 @@ public class World extends Thread {
                                     new Runnable() {
                                         public void run() {
                                             if (tgui.detected(lr))
-                                                System.out.println("$ Kill detection robot : " + lr.getRobotName());
+                                                System.out.println("$ lost robot : '" + lr.getRobotName() + "' on '" + tgui.getTitle() + "'");
                                             tgui.undetectRobot(lr);
                                         }
                                     });
@@ -155,7 +155,7 @@ public class World extends Thread {
                                     new Runnable() {
                                         public void run() {
                                             if (tgui.detected(lr) && !tgui.controllable(lr))
-                                                System.out.println("$ Make controllable robot : " + lr.getRobotName());
+                                                System.out.println("$ control robot : '" + lr.getRobotName() + "' on '" + tgui.getTitle() + "'");
                                             tgui.makeControllable(lr);
                                         }
                                     });
@@ -170,7 +170,7 @@ public class World extends Thread {
                                     new Runnable() {
                                         public void run() {
                                             if (tgui.controllable(lr))
-                                                System.out.println("$ Make uncontrollable robot : " + lr.getRobotName());
+                                                System.out.println("$ loose control robot : '" + lr.getRobotName() + "' on '" + tgui.getTitle() + "'");
                                             tgui.makeUncontrollable(lr);
                                         }
                                     });

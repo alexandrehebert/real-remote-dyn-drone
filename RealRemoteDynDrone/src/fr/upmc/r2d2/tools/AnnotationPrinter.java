@@ -3,6 +3,9 @@ package fr.upmc.r2d2.tools;
 import java.lang.annotation.Annotation;
 
 /**
+ * Classe d'affichage correct des annotations
+ * pour palier au défaut du toString dans les annotations d'origine
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
