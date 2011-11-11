@@ -14,11 +14,11 @@ import fr.upmc.r2d2.tools.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -119,6 +119,7 @@ public class MainJavassist_2 {
 
                     maker.make();
                 }
+                
             });
 
         }
@@ -221,8 +222,10 @@ public class MainJavassist_2 {
         }
         
         private void processGroup(String groupName, String component) {
-            if (!groupPanels.containsKey(groupName))
-                groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel(\""+ groupName +"\");"));
+            if (!groupPanels.containsKey(groupName)) {
+                groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel(\""+ groupName +"\");"
+                        + "panels.add(" + groupName + ");"));
+            }
             
             groupPanels.get(groupName)
                     .append("addComponent(")
@@ -345,15 +348,15 @@ public class MainJavassist_2 {
         public void make() throws Exception {
             robot.setInterfaces(new CtClass[]{LOADER.getCtClass(pool, "fr.upmc.dtgui.robot.InstrumentedRobot")});
             
-            if (hasSensors()) {
+            //if (hasSensors()) {
                 System.out.println("\tclass " + robot.getSimpleName() + SENDER_EXT);
                 makeSensors();
-            }
+            //}
             
-            if (hasActuators()) {
+            //if (hasActuators()) {
                 System.out.println("\tclass " + robot.getSimpleName() + RECEPTOR_EXT);
                 makeActuators();
-            }
+            //}
             
             robot.writeFile();
             
@@ -409,7 +412,7 @@ public class MainJavassist_2 {
             robot.addField(CtField.make("private " + robot.getName() + RECEPTOR_EXT + " adr;", robot));
             robot.getDeclaredMethod("start").insertBefore("adr.start();");
             robot.addMethod(CtMethod.make(Utils.readSnippet("Robot.getActuatorDataQueue"), robot));
-            robot.getDeclaredMethod("getActuatorDataQueue").setModifiers(Modifier.ABSTRACT); 
+            // robot.getDeclaredMethod("getActuatorDataQueue").setModifiers(Modifier.ABSTRACT); 
             robot.getConstructors()[0].insertAfter("adr = new " + robot.getName() + RECEPTOR_EXT + "($0);");
         }
         
@@ -427,8 +430,8 @@ public class MainJavassist_2 {
             
             StringBuilder gpanels = new StringBuilder();
             
-            for(StringBuffer gpanel : groupPanels.values())
-                gpanels.append(gpanel.toString());
+            for(Entry<String, StringBuffer> gpanel : groupPanels.entrySet())
+                gpanels.append(gpanel.getValue().toString());
             
             Utils.log(gpanels.toString());
             
@@ -446,7 +449,7 @@ public class MainJavassist_2 {
 
         public boolean hasActuators() {
             return robot.hasAnnotation(WithActuators.class);
-        }        
+        }
 
         /**
          * Créer une nouvelle classe de DataQueue

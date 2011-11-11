@@ -67,7 +67,7 @@ import fr.upmc.dtgui.robot.Robot;
  */
 @WithSensors
 @WithActuators
-public class FirstLittleRobot extends Thread
+public class LittleRobot extends Thread
         implements Robot {
 
     /** Maximum energy level in the robot.								*/
@@ -87,7 +87,7 @@ public class FirstLittleRobot extends Thread
     /** Position of the robot along the ordinate axis, in meters.		*/
     protected double y = 100.0;							// m
     /** Current speed in m/s, >= 0.0 and <= 20.0.						*/
-    protected double speed = 2.0;						// m/s
+    protected double speed = 20.0;						// m/s
     /** Current energy level as a percentage of remaining energy.		*/
     protected double energyLevel = 100.0;				// percentage
     /**
@@ -104,7 +104,7 @@ public class FirstLittleRobot extends Thread
      * positive angles mean a left turn on the screen, while negative ones
      * mean a right turn.
      */
-    protected double steeringAngle = 5.0;				// degrees
+    protected double steeringAngle = 0.0;				// degrees
     /** Simulation time step in milliseconds */
     protected int timeStep = 100;
     /** Current simulation  time in milliseconds */
@@ -125,7 +125,7 @@ public class FirstLittleRobot extends Thread
      * 		this.sds != null && !this.sds.isAlive()
      * </pre>
      */
-    public FirstLittleRobot(
+    public LittleRobot(
             String robotName,
             double x,
             double y,
@@ -354,17 +354,17 @@ public class FirstLittleRobot extends Thread
     protected double energyConsumptionPerSecond() {
         double ret = 0.0;
 
-        double c1 = 100.0 / (FirstLittleRobot.AUTONOMY_10 * Math.sqrt(10.0));
+        double c1 = 100.0 / (LittleRobot.AUTONOMY_10 * Math.sqrt(10.0));
         double c2 =
-                (((100.0 / FirstLittleRobot.AUTONOMY_20)
-                - (100.0 / FirstLittleRobot.AUTONOMY_10))
+                (((100.0 / LittleRobot.AUTONOMY_20)
+                - (100.0 / LittleRobot.AUTONOMY_10))
                 / ((20.0 - 10.0) * (20.0 - 10.0)));
 
         if (this.speed <= 10.0) {
             ret = c1 * Math.sqrt(this.speed);
         } else {
             ret = c2 * (this.speed - 10.0) * (this.speed - 10.0)
-                    + (100.0 / FirstLittleRobot.AUTONOMY_10);
+                    + (100.0 / LittleRobot.AUTONOMY_10);
         }
         return ret;
     }

@@ -2,7 +2,7 @@ package fr.upmc.r2d2.mains;
 
 import fr.upmc.dtgui.example.World;
 import fr.upmc.dtgui.tests.AnotherLittleRobot;
-import fr.upmc.dtgui.tests.FirstLittleRobot;
+import fr.upmc.dtgui.tests.LittleRobot;
 import fr.upmc.dtgui.robot.Robot;
 import fr.upmc.r2d2.tools.Utils;
 import java.lang.annotation.Annotation;
@@ -59,7 +59,7 @@ public class MainTests {
      */
     @Before
     public void setUp() throws Exception {
-        robotsClassLoader = new Class[] {FirstLittleRobot.class, AnotherLittleRobot.class};
+        robotsClassLoader = new Class[] {LittleRobot.class, AnotherLittleRobot.class};
         word = World.class;
     }
     

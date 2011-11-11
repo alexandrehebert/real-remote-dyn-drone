@@ -8,7 +8,6 @@ import fr.upmc.dtgui.gui.TeleoperationGUI;
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.example.robot.ExampleGUI;
 import fr.upmc.dtgui.example.robot.LittleRobot;
-import fr.upmc.dtgui.tests.FirstLittleRobot;
 
 /**
  * The class <code>World</code> simulates a space within which robots move and

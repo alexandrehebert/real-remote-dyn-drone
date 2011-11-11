@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 import fr.upmc.dtgui.gui.TeleoperationGUI;
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.tests.AnotherLittleRobot;
-import fr.upmc.dtgui.tests.FirstLittleRobot;
+import fr.upmc.dtgui.tests.LittleRobot;
 import fr.upmc.r2d2.boards.DynGUI;
 import fr.upmc.r2d2.robots.RobotFactory;
 
@@ -68,15 +68,15 @@ public class World extends Thread {
     public final void createRobots() {
         this.instrumentedRobots = new InstrumentedRobot[]{
             /*double x, double y, double direction */
-            RobotFactory.make(FirstLittleRobot.class, "No 001", 2000.0, 950.0, 45.0),
-            RobotFactory.make(AnotherLittleRobot.class, "No 002", 2850.0, 950.0, 135.0, 10.0)
+            RobotFactory.make(LittleRobot.class, "No 001", 2000.0, 950.0, 45.0),
+            //RobotFactory.make(AnotherLittleRobot.class, "No 002", 2850.0, 950.0, 135.0, 20.0)
         };
     }
 
     public final void createGUIs() {
         this.teleoperationStations = new TeleoperationGUI[]{
-            new DynGUI("1", 2500, 1500, 500, 500, 400, 1000, 600),
-            new DynGUI("2", 3500, 1500, 500, 500, 400, 1000, 600)
+            new DynGUI("1", 2500, 1500, 500, 500, 400, 1000, 1000),
+            new DynGUI("2", 3500, 1500, 500, 500, 400, 1000, 1000)
         };
     }
 
@@ -121,7 +121,8 @@ public class World extends Thread {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
                                         public void run() {
-                                            System.out.println("$ Run detection robot : " + lr.getRobotName());
+                                            if (!tgui.detected(lr))
+                                                System.out.println("$ Run detection robot : " + lr.getRobotName());
                                             tgui.detectRobot(lr);
                                         }
                                     });
@@ -135,7 +136,8 @@ public class World extends Thread {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
                                         public void run() {
-                                            System.out.println("$ Kill detection robot : " + lr.getRobotName());
+                                            if (tgui.detected(lr))
+                                                System.out.println("$ Kill detection robot : " + lr.getRobotName());
                                             tgui.undetectRobot(lr);
                                         }
                                     });
@@ -152,7 +154,8 @@ public class World extends Thread {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
                                         public void run() {
-                                            System.out.println("$ Make controllable robot : " + lr.getRobotName());
+                                            if (tgui.detected(lr) && !tgui.controllable(lr))
+                                                System.out.println("$ Make controllable robot : " + lr.getRobotName());
                                             tgui.makeControllable(lr);
                                         }
                                     });
@@ -166,7 +169,8 @@ public class World extends Thread {
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
                                         public void run() {
-                                            System.out.println("$ Make uncontrollable robot : " + lr.getRobotName());
+                                            if (tgui.controllable(lr))
+                                                System.out.println("$ Make uncontrollable robot : " + lr.getRobotName());
                                             tgui.makeUncontrollable(lr);
                                         }
                                     });

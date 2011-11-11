@@ -14,6 +14,10 @@ public class		PositioningData		extends RobotStateData {
 		this.y = y;
 		this.direction = direction ;
 	}
+        
+        public String toString() {
+            return "pd{x=" + x + ";y=" + y + ";d=" + direction + "}";
+        }
 
 }
 

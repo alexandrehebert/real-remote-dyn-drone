@@ -28,8 +28,10 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
         
         setLayout(new BorderLayout());
         setSize(450, 125);
-        setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
-        
+        setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
+    }
+    
+    public void generateComponent() {
         component = createComponent();
         add(component, BorderLayout.NORTH);
         
@@ -39,6 +41,7 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
         super.add(labelPane, BorderLayout.SOUTH);
         
         setVisible(true);
+        validate();
     }
     
     @Override

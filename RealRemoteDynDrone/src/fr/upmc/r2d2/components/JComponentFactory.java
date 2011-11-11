@@ -13,11 +13,15 @@ public class JComponentFactory {
         DefaultBoundedRangeModel model = new DefaultBoundedRangeModel(0, 0, (int) minRange, (int) maxRange);   
         JSlider js = new JSlider(model);
         
+        
+        double range = (maxRange - minRange);
+        range = Math.ceil(range / 2.);
+        
         js.setOrientation(JSlider.VERTICAL);
-        js.setMajorTickSpacing(20);
-        js.setMinorTickSpacing(5);
+        js.setMajorTickSpacing((int) range);
+        js.setMinorTickSpacing((int) (range / 2));
         js.setPaintTicks(true);
-        js.setPaintLabels(true);  
+        js.setPaintLabels(true);
         
         return js;
     }

@@ -263,32 +263,27 @@ public abstract class AbstractTeleoperationBoard
                         
                         if ((pd = PositioningDataFactory.getInstance().eat(rsd)) != null) {
                             final PositioningData pdf = (PositioningData) pd;
-
                             SwingUtilities.invokeAndWait(
                                     new Runnable() {
                                         public void run() {
                                             positionDisplay.draw(pdf);
                                         }
                                     });
-                        } else {
-                            if (rsd.getGroupName().equals("position"))
-                                continue;
-                            
-                            if (this.tBoard != null) {
-                                final MessageData rsd1 = rsd;
-                                SwingUtilities.invokeAndWait(
-                                        new Runnable() {
-                                            public void run() {
-                                                if (tBoard != null) {
-                                                    tBoard.processSensorData(rsd1);
-                                                }
-                                            }
-                                        });
-                            }
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
+                        /*if (rsd.getGroupName().equals("position"))
+                            continue;*/
+                        if (this.tBoard != null) {
+                            final MessageData rsd1 = rsd;
+                            SwingUtilities.invokeAndWait(
+                                    new Runnable() {
+                                        public void run() {
+                                            if (tBoard != null) {
+                                                tBoard.processSensorData(rsd1);
+                                            }
+                                        }
+                                    });
+                        }
+                    } catch (InterruptedException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
                 }

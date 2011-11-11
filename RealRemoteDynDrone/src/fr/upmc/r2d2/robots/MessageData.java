@@ -14,12 +14,15 @@ public class MessageData extends HashMap.SimpleEntry<String, Object> {
     }
     
     public MessageData(String groupName, String methodName, Object value) {
-        super(methodName, value);
+        this(methodName, value);
         this.groupName = groupName;
-    }    
+    }
     
     public String getGroupName() {
         return groupName;
     }
+    
+    public String toString() {
+        return "md{g=" + groupName + ";m=" + getKey() + ";v=" + getValue() + "}";
+    }
 }
-

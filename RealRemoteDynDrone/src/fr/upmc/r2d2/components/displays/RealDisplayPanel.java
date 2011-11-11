@@ -24,6 +24,7 @@ public class RealDisplayPanel extends AbstractDisplayPanel<JSlider> {
         this.minRange = minRange;
         this.maxRange = maxRange;
         this.variation = variation;
+        generateComponent();
     }
     
     @Override

@@ -10,10 +10,10 @@ import javax.swing.JPanel;
  */
 public class GroupPanel extends JPanel {
 
-    protected int height = 0, width = 100;
+    protected int height = 0, width = 0;
 
     public GroupPanel(String name) {
-        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        super.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         
         JLabel displayLabel = new JLabel(name);
         JPanel labelPane = new JPanel();
