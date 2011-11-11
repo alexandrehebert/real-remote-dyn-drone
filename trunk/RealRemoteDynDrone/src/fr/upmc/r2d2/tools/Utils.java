@@ -107,4 +107,24 @@ public class Utils {
         void run() throws Exception;
     }
     
+    
+    /**
+     * Converti les classes wrappers (Double, Integer etc...) en classe de type 
+     * primitifs (double, int etc.)
+     * @param c
+     * @return 
+     */
+    public static Class class2primitive(Class c) {
+        if (c == Double.class)
+            return double.class;
+        if (c == Integer.class)
+            return int.class;
+        if (c == Boolean.class)
+            return boolean.class;
+        if (c == Float.class)
+            return float.class;
+        if (c == Byte.class)
+            return byte.class;
+        return c;
+    }    
 }

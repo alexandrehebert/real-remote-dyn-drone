@@ -24,11 +24,10 @@ public class RealControllerPanel extends AbstractControllerPanel<JSlider> {
     
     public RealControllerPanel(String groupName, String methodName, double minWritingRate, double maxWritingRate, String unit, double minRange, double maxRange) {
         super(groupName, methodName, minWritingRate, maxWritingRate);
-        
         this.unit = unit;
         this.minRange = minRange;
         this.maxRange = maxRange;
-        
+        generateComponent();
     }
 
     /**
@@ -40,24 +39,40 @@ public class RealControllerPanel extends AbstractControllerPanel<JSlider> {
     
     public JSlider createComponent() {
         return JComponentFactory.makeSlider(minRange, maxRange);
-    } 
+    }
 
     @Override
     public EventListener connect(final BlockingQueue bq) {
-        return new ChangeListener() {
+        ChangeListener cl = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-
-                MessageData sc = new MessageData(getMethodName(), source.getValue());
-                        
+                
+                MessageData sc = new MessageData(getMethodName(), (double) source.getValue());
+                System.out.println(sc);
+                
                 (new ActuatorDataSender(sc, bq)).start();
             }
         };
+        component.addChangeListener(cl);
+        return cl;
     }
 
     @Override
     public void disconnect(EventListener el) {
         component.removeChangeListener((ChangeListener) el);
+    }
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder("controller{");
+        sb.append("method=" + getMethodName() + ";");
+        sb.append("group=" + getGroupName() + ";");
+        sb.append("unit=" + unit + ";");
+        sb.append("range{min=" + minRange + ";");
+        sb.append("max=" + maxRange + "};");
+        sb.append("rate{min=" + minRate + ";");
+        sb.append("max=" + maxRate + "}");
+        sb.append("}");
+        return sb.toString();
     }
     
 }

@@ -19,8 +19,7 @@ public class RobotFactory {
             /**
              * @TODO solution temporaire pour pallier au type primitif
              */
-            cargs.add(arg.getClass().getSimpleName().equals("Double") ? 
-                    double.class : arg.getClass());
+            cargs.add(Utils.class2primitive(arg.getClass()));
         }
         
         try {

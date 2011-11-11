@@ -20,11 +20,14 @@ public class ActuatorCommand {
     }
     
     public static void performOn(InstrumentedRobot r, MessageData d) {
+        System.out.println(r.getRobotName() + " : command = " + d.getGroupName());
+        
         try {
-            Method actuator = r.getClass().getMethod(d.getKey(), d.getValue().getClass());
+            Method actuator = r.getClass().getMethod(d.getKey(), Utils.class2primitive(d.getValue().getClass()));
             actuator.invoke(r, d.getValue());
         } catch (Exception ex) {
             Utils.print(ex);
         }
     }
+
 }
