@@ -31,7 +31,7 @@ import javassist.CtMethod;
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
-public class MainJavassist_2 {
+public class MainJavassist {
 
     private static final WalkAnnotations WALKER = new WalkAnnotations();
     private static final AssistantLoader LOADER = new AssistantLoader();
