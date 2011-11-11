@@ -86,9 +86,6 @@ public class MainTests {
         System.out.println("> fields");
         for (Field f : sds.getClass().getDeclaredFields())
             System.out.println("\t" + f.getName());
-        
-        
-        
     }
     
 }

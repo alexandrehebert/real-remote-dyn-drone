@@ -36,7 +36,7 @@ public class Utils {
         if (logger.length() == 0)
             Runtime.getRuntime().addShutdownHook(new Thread(){
                 public void run() {
-                    System.out.println(logger);
+                    // System.out.println(logger);
                 }
             });     
         
