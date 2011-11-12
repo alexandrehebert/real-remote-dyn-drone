@@ -4,6 +4,9 @@ import java.awt.Color;
 import javax.swing.JComponent;
 
 /**
+ * Classe abstraite de déclaration d'un contrôle de type display qui sera
+ * gréffé dans un GroupPanel par la suite
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

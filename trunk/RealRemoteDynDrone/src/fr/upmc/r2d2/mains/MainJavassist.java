@@ -287,12 +287,6 @@ public class MainJavassist {
             ));
         }
 
-        /**
-         * @TODO
-         * @param m
-         * @param name
-         * @param sensor 
-         */
         public void processAnnotation(CtMethod m, String name, IntegerSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Integer");
             processGroup(sensor.groupName(), 
@@ -308,12 +302,6 @@ public class MainJavassist {
             ));
         }
         
-        /**
-         * @TODO
-         * @param m
-         * @param name
-         * @param sensor 
-         */        
         public void processAnnotation(CtMethod m, String name, BooleanSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Boolean");
             processGroup(sensor.groupName(), 
@@ -422,7 +410,7 @@ public class MainJavassist {
                 makeSensors();
             //}
             
-            //if (hasActuators()) {
+            //if (hasActuators()) { on doit créé une queue dans tous les cas, qu'elle soit vide ou non
                 System.out.println("\tclass " + robot.getSimpleName() + RECEPTOR_EXT);
                 makeActuators();
             //}
@@ -552,7 +540,6 @@ public class MainJavassist {
             cons.callsSuper();
             cons.setBody("this.robot = $1;");
             
-            
             dataQueue.addConstructor(cons);
 
             return dataQueue;
@@ -597,7 +584,6 @@ public class MainJavassist {
             });
         }
     }
-     * 
      */
     
 }

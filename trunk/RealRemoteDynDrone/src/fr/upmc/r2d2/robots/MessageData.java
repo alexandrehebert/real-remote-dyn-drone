@@ -3,6 +3,10 @@ package fr.upmc.r2d2.robots;
 import java.util.HashMap;
 
 /**
+ * Type de donnée transitant entre les boards et les robots
+ * Cette "capsule" est suffisament générique pour supporter n'importe quel
+ * type de donnée
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

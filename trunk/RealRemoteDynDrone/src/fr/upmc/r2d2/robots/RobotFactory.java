@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @see RobotFactory#make(java.lang.Class, java.lang.Object[]) 
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
