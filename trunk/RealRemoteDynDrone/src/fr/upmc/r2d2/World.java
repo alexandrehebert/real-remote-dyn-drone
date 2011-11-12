@@ -63,14 +63,22 @@ public class World extends Thread {
         }
     }
 
+    /**
+     * Création des robots
+     * On passe par une factory pour rendre compilable l'ajout de Robot qui ne
+     * seront InstrumentedRobot qu'après le passage de javassist
+     */
     public final void createRobots() {
         this.instrumentedRobots = new InstrumentedRobot[]{
-            /*double x, double y, double direction */
             RobotFactory.make(LittleRobot.class, "No 001", 2000.0, 950.0, 45.0),
             RobotFactory.make(AnotherLittleRobot.class, "No 002", 2850.0, 950.0, 135.0, 20.0)
         };
     }
 
+    /**
+     * Création des guis,
+     * Chacun de ses panneaux contiendra une vue sur une partie de l'univers
+     */
     public final void createGUIs() {
         this.teleoperationStations = new TeleoperationGUI[]{
             new DynGUI("1", 2500, 1500, 500, 500, 400, 1000, 1000),
