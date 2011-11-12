@@ -27,4 +27,8 @@ public abstract class AbstractDisplayPanel<J extends JComponent> extends Abstrac
      */
     public abstract void update(Object sd);
     
+    public String toString() {
+        return "display{" + super.toString() + "}";
+    }
+    
 }

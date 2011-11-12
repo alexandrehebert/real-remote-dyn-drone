@@ -295,9 +295,17 @@ public class MainJavassist {
          */
         public void processAnnotation(CtMethod m, String name, IntegerSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Integer");
-            /**
-             * @TODO générer les bons displays
-             */
+            processGroup(sensor.groupName(), 
+                    String.format(Locale.US, "IntegerDisplayPanel(\"%s\", \"%s\", %f, %f, \"%s\", %d, %d, VariationType.%s)", 
+                    sensor.groupName(),
+                    name, 
+                    sensor.minReadingRate(),
+                    sensor.maxReadingRate(),
+                    sensor.unit().name(),
+                    sensor.dataRange().inf(),
+                    sensor.dataRange().sup(),
+                    sensor.variation().toString()
+            ));
         }
         
         /**
@@ -308,9 +316,13 @@ public class MainJavassist {
          */        
         public void processAnnotation(CtMethod m, String name, BooleanSensorData sensor) {
             processAnnotation(sensor.groupName(), name, "Boolean");
-            /**
-             * @TODO générer les bons displays
-             */
+            processGroup(sensor.groupName(), 
+                    String.format(Locale.US, "BooleanDisplayPanel(\"%s\", \"%s\", %f, %f)", 
+                    sensor.groupName(),
+                    name, 
+                    sensor.minReadingRate(),
+                    sensor.maxReadingRate()
+            ));
         }
         
         /*******************************************************
@@ -332,15 +344,26 @@ public class MainJavassist {
         }
         
         public void processAnnotation(CtMethod m, String name, IntegerActuatorData sensor) {
-            /**
-             * @TODO générer les bons controllers
-             */
+            processGroup(sensor.groupName(), 
+                    String.format(Locale.US, "RealControllerPanel(\"%s\", \"%s\", %f, %f, \"%s\", %d, %d)", 
+                    sensor.groupName(),
+                    name, 
+                    sensor.minWritingRate(),
+                    sensor.maxWritingRate(),
+                    sensor.unit().name(),
+                    sensor.dataRange().inf(),
+                    sensor.dataRange().sup()
+            ));
         }
         
         public void processAnnotation(CtMethod m, String name, BooleanActuatorData sensor) {
-            /**
-             * @TODO générer les bons controllers
-             */
+            processGroup(sensor.groupName(), 
+                    String.format(Locale.US, "RealControllerPanel(\"%s\", \"%s\", %f, %f)", 
+                    sensor.groupName(),
+                    name, 
+                    sensor.minWritingRate(),
+                    sensor.maxWritingRate()
+            ));
         }    
         
        /**

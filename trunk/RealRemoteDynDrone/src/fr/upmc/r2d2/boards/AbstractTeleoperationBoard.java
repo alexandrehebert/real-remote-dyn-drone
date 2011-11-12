@@ -320,6 +320,10 @@ public abstract class AbstractTeleoperationBoard
             this.rac = rac;
             this.commandQueue = commandQueue;
         }
+        
+        public static void send(BlockingQueue commandQueue, MessageData data) {
+            (new ActuatorDataSender(data, commandQueue)).start();
+        }
 
         @Override
         public void run() {

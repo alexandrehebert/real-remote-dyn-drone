@@ -8,6 +8,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
+ * Element constitutif d'un GroupPanel
+ * Peut être soit un controller, soit un display
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
@@ -31,6 +34,9 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
     }
     
+    /**
+     * Génère le controle associé au Panel et l'ajou à ce dernier
+     */
     public void generateComponent() {
         component = createComponent();
         add(component, BorderLayout.NORTH);
@@ -50,23 +56,46 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
         component.setVisible(aFlag);
     }
 
+    /**
+     * Par défaut le titre du controle est le nom de la méthode associée à l'actuateur
+     * ou au senseur privé de "set" ou "get"
+     * 
+     * @return 
+     */
     public String createTitle() {
         return getMethodName().substring(3);
     }
     
+    /**
+     * Créé le controle associé au panel, diffère en fonction des displays et des
+     * controllers ainsi que des types Real, Integer ou Boolean des données qu'ils
+     * permettent de manipuler (actuators, sensors)
+     * 
+     * @return 
+     */
     public abstract J createComponent();
 
     /**
      * @return the groupName
      */
-    public String getGroupName() {
+    public final String getGroupName() {
         return groupName;
     }
 
     /**
      * @return the methodName
      */
-    public String getMethodName() {
+    public final String getMethodName() {
         return methodName;
     }
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("method=").append(getMethodName()).append(";");
+        sb.append("group=").append(getGroupName()).append(";");
+        sb.append("rate{min=").append(minRate).append(";");
+        sb.append("max=").append(maxRate).append("};");
+        return sb.toString();
+    }
+    
 }
