@@ -17,13 +17,13 @@ public abstract class AbstractControllerPanel<J extends JComponent> extends Abst
     public AbstractControllerPanel(String groupName, String methodName, double minRate, double maxRate) {
         super(groupName, methodName, minRate, maxRate);
     }
-
-    public void disconnectRobot() {
+    
+    public final void disconnectRobot() {
         this.r = null;
         disconnect(el);
     }
 
-    public void connectRobot(InstrumentedRobot r) {
+    public final void connectRobot(InstrumentedRobot r) {
         this.r = r;
         el = connect(r.getActuatorDataQueue());
     }
@@ -31,5 +31,9 @@ public abstract class AbstractControllerPanel<J extends JComponent> extends Abst
     public abstract EventListener connect(final BlockingQueue bq);
 
     public abstract void disconnect(EventListener el);
+    
+    public String toString() {
+        return "controller{" + super.toString() + "}";
+    }
     
 }

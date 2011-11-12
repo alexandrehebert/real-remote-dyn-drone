@@ -20,7 +20,7 @@ public class ActuatorCommand {
     }
     
     public static void performOn(InstrumentedRobot r, MessageData d) {
-        System.out.println(r.getRobotName() + " : command = " + d.getGroupName());
+        System.out.println("$ execute command " + d + " on " + r.getRobotName());
         
         try {
             Method actuator = r.getClass().getMethod(d.getKey(), Utils.class2primitive(d.getValue().getClass()));

@@ -2,7 +2,6 @@ package fr.upmc.r2d2.robots;
 
 import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.r2d2.tools.Utils;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +11,19 @@ import java.util.List;
  */
 public class RobotFactory {
     
+    /**
+     * Cette méthode à pour objectif d'abstraire du programme les déclaration explicites
+     * des instanciations des diverses classes de robot.
+     * 
+     * Ainsi, lorsque les classes sont modifiées par Javassist, l'instanciation par
+     * reflexion fonctionne, tandis que si l'on essaye d'instancier des robots
+     * explicitement, une erreur de compilation survient : le robot n'est pas
+     * encore instrumented
+     * 
+     * @param robotClass
+     * @param args
+     * @return 
+     */
     public static InstrumentedRobot make(Class robotClass, Object... args) {
         List<Class> cargs = new ArrayList();
         

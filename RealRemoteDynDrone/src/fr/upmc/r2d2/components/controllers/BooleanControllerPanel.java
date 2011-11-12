@@ -7,6 +7,7 @@ import fr.upmc.r2d2.robots.MessageData;
 import java.util.EventListener;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -14,55 +15,35 @@ import javax.swing.event.ChangeListener;
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
-public class RealControllerPanel extends AbstractControllerPanel<JSlider> {
+public class BooleanControllerPanel extends AbstractControllerPanel<JToggleButton> {
     
-    /**
-     * Informations des annotations
-     */
-    private String unit;
-    private double minRange, maxRange;
-    
-    public RealControllerPanel(String groupName, String methodName, double minWritingRate, double maxWritingRate, String unit, double minRange, double maxRange) {
+    public BooleanControllerPanel(String groupName, String methodName, double minWritingRate, double maxWritingRate) {
         super(groupName, methodName, minWritingRate, maxWritingRate);
-        this.unit = unit;
-        this.minRange = minRange;
-        this.maxRange = maxRange;
         generateComponent();
     }
     
-    /**
-     * @return 
-     */
-    public String createTitle() {
-        return super.createTitle() + " (" + unit + ")";
-    }
-    
-    public JSlider createComponent() {
-        return JComponentFactory.makeSlider(minRange, maxRange);
+    public JToggleButton createComponent() {
+        return JComponentFactory.makeToggleButton(false);
     }
 
     @Override
     public EventListener connect(final BlockingQueue bq) {
         ChangeListener cl = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                ActuatorDataSender.send(bq, new MessageData(getMethodName(), (double) component.getValue()));
+                ActuatorDataSender.send(bq, new MessageData(getMethodName(), (boolean) component.isSelected()));
             }
         };
         component.addChangeListener(cl);
         return cl;
     }
-
+    
     @Override
     public void disconnect(EventListener el) {
         component.removeChangeListener((ChangeListener) el);
     }
     
     public String toString() {
-        StringBuilder sb = new StringBuilder(super.toString());
-        sb.append("unit=").append(unit).append(";");
-        sb.append("range{min=").append(minRange).append(";");
-        sb.append("max=").append(maxRange).append("}");
-        return sb.toString();
+        return super.toString();
     }
     
 }
