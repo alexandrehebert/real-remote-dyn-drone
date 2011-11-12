@@ -9,12 +9,14 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 /**
+ * Utilitaires
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
 public class Utils {
 
-    private static boolean verbose = true;
+    private static boolean verbose = true, logs = false;
     
     /**
      * Debug
@@ -26,7 +28,7 @@ public class Utils {
             return;
         }
         // System.out.println(t.getMessage());
-        System.err.println(t.getMessage());
+        System.err.println(t);
         t.printStackTrace(System.err);
     }
     
@@ -36,12 +38,11 @@ public class Utils {
         if (logger.length() == 0)
             Runtime.getRuntime().addShutdownHook(new Thread(){
                 public void run() {
-                    // System.out.println(logger);
+                    if (logs)
+                        System.out.println(logger);
                 }
-            });     
-        
+            });
         logger.append(l).append("\n");
-   
     }
 
     /**
@@ -53,7 +54,17 @@ public class Utils {
     public static void verbose(boolean verbose) {
         Utils.verbose = verbose;
     }
+    
+    public static void log(boolean verbose) {
+        Utils.logs = verbose;
+    }
 
+    /**
+     * Récupère le contenu d'un snippet dans une chaine de caractères
+     * 
+     * @param name
+     * @return 
+     */
     public static String readSnippet(String name) {
         String file = "";
         try {
@@ -71,6 +82,13 @@ public class Utils {
         return file;
     }
 
+    /**
+     * Récupère le résultat de la sérialisation d'un objet dans une chaine
+     * de caractères
+     * 
+     * @param o
+     * @return 
+     */
     public static String serialize(Object o) {
         final StringBuffer s = new StringBuffer();
         try {
@@ -88,6 +106,13 @@ public class Utils {
         }
     }
     
+    /**
+     * Affiche un block dans le terminal pour une meilleure lisibilité du debug
+     * 
+     * @param name
+     * @param b
+     * @throws Exception 
+     */
     public static void block(String name, Block b) throws Exception {
         System.out.println("-------------------------------------------------");
         System.out.println("|\t" + whiteSpacesCompletion(name, 40) + "|");
@@ -109,7 +134,7 @@ public class Utils {
     
     
     /**
-     * Converti les classes wrappers (Double, Integer etc...) en classe de type 
+     * Convertit les classes wrappers (Double, Integer etc...) en classe de type 
      * primitifs (double, int etc.)
      * @param c
      * @return 

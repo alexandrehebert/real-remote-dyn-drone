@@ -7,9 +7,10 @@ import fr.upmc.dtgui.robot.InstrumentedRobot;
 import fr.upmc.dtgui.robot.Robot;
 import java.awt.HeadlessException;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 /**
+ * 
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
@@ -17,7 +18,20 @@ public class DynGUI extends TeleoperationGUI {
 
     private static final long serialVersionUID = 1L;
     private HashMap<Class<? extends Robot>, RobotTeleoperationBoard> boards = new HashMap();
-
+    
+    /**
+     * Création d'un DynGui et ajout de l'ensemble des boards associés aux robots
+     * 
+     * @param panelName
+     * @param absoluteX
+     * @param absoluteY
+     * @param relativeX
+     * @param relativeY
+     * @param controlRadius
+     * @param sizeX
+     * @param sizeY
+     * @throws HeadlessException 
+     */
     public DynGUI(
             String panelName,
             int absoluteX,
@@ -29,7 +43,9 @@ public class DynGUI extends TeleoperationGUI {
             int sizeY) throws HeadlessException {
         super(panelName, absoluteX, absoluteY, relativeX, relativeY,
                 controlRadius, sizeX, sizeY);
-        /* ici on initialisera la map boards avec Javassist */
+        /* 
+         * /!\ ici on initialisera la map boards avec Javassist /!\
+         */
     }
     
     public RobotTeleoperationBoard createBoard(InstrumentedRobot r) {

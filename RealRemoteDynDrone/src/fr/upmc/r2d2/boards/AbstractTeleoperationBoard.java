@@ -86,19 +86,22 @@ public abstract class AbstractTeleoperationBoard
         return gp;
     }
     
-    protected abstract void createPanels();
-    /* 
-     * GroupPanel group1 = addGroup("...");
+    /**
+     * Génération des contrôles du board,
+     * cette méthode sera implantée par javassist
      * 
-     * addComponent(group, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
-     * addComponent(group, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
+     * exemple :
+     *  GroupPanel group1 = addGroup("...");
      * 
-     * GroupPanel group2 = addGroup("...");
+     *  addComponent(group1, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
+     *  addComponent(group1, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
      * 
-     * addComponent(groupName, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
-     * addComponent(groupName, new RealControllerPanel(ieioj, efzf, efzf, efzzef));
-     * };
+     *  GroupPanel group2 = addGroup("...");
+     * 
+     *  addComponent(group2, new RealDisplayPanel(ieioj, efzf, efzf, efzzef));
+     *  addComponent(group2, new BooleanControllerPanel(ieioj, efzf, efzf, efzzef));
      */
+    protected abstract void createPanels();
     
     protected void addComponent(GroupPanel gp, AbstractDisplayPanel adp) {
         gp.addComponent(adp);
@@ -109,8 +112,6 @@ public abstract class AbstractTeleoperationBoard
         gp.addComponent(adp);
         controllers.put(adp.getMethodName(), adp);
     }
-    
-
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -254,7 +255,8 @@ public abstract class AbstractTeleoperationBoard
                 for (int i = 0; i <= n; i++) {
                     rsd = current.elementAt(i);
                     try {
-                        
+                        // on tente de manger la donnée pour construire l'instance
+                        // de positioning data
                         if ((pd = PositioningDataFactory.getInstance().eat(rsd)) != null) {
                             final PositioningData pdf = (PositioningData) pd;
                             SwingUtilities.invokeAndWait(

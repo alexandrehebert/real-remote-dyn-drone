@@ -14,6 +14,9 @@ import javassist.NotFoundException;
 import javassist.Translator;
 
 /**
+ * Surcouche à Javassist permettant de s'abstraire d'un certain nombre de
+ * mécanismes verbeux inhérents à cette API, y compris des try...catch à répétition
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

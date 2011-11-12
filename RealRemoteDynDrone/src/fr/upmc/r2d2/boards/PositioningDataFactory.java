@@ -4,6 +4,9 @@ import fr.upmc.dtgui.robot.PositioningData;
 import fr.upmc.r2d2.robots.MessageData;
 
 /**
+ * Construction d'un PositioningData à partir des données envoyées par les
+ * sensors du robot
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
@@ -34,7 +37,17 @@ public class PositioningDataFactory {
     private Double x, y, d;
     private int stamp = 0;
 
+    /**
+     * L'objectif ici est d'avaler un certain nombre de MessageData jusqu'à obtenir
+     * l'ensemble des données nécessaires à la construction d'une instance de type
+     * PositioningData, qui nous sera indispensable pour l'affichage du robot 
+     * dans l'univers
+     * 
+     * @param data
+     * @return 
+     */
     public PositioningData eat(MessageData data) {
+        if (!data.getGroupName().equals("position")) return null;
        /*switch (PositioningDataAttribute.toAttrType(data.getKey())) {
             case X: 
             default:
@@ -58,4 +71,5 @@ public class PositioningDataFactory {
         
         return null;
     }
+    
 }

@@ -6,6 +6,9 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.JComponent;
 
 /**
+ * Classe abstraite de déclaration d'un contrôle de type controller qui sera
+ * gréffé dans un GroupPanel par la suite
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
@@ -28,8 +31,19 @@ public abstract class AbstractControllerPanel<J extends JComponent> extends Abst
         el = connect(r.getActuatorDataQueue());
     }
 
+    /**
+     * On veut connecter le contrôle à la queue d'envoi de commandes
+     * 
+     * @param bq
+     * @return 
+     */
     public abstract EventListener connect(final BlockingQueue bq);
 
+    /**
+     * On veut déconnecter le contrôle de la queue d'envoi de commandes
+     * 
+     * @param el 
+     */
     public abstract void disconnect(EventListener el);
     
     public String toString() {

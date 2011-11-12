@@ -5,6 +5,8 @@ import fr.upmc.r2d2.tools.Utils;
 import java.lang.reflect.Method;
 
 /**
+ * Execution d'une commande reçue par un robot
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
