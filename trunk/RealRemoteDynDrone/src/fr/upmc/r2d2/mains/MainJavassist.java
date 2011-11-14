@@ -15,9 +15,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,11 +40,10 @@ public class MainJavassist {
     public static void main(String[] args) throws Throwable {
         LOADER.addTranslator(robotTranslator, "@fr.upmc.dtgui.annotations.WithSensors");
         LOADER.addTranslator(guiTranslator, "fr.upmc.r2d2.boards.DynGUI");
-        
-        //LOADER.run("fr.upmc.r2d2.mains.MainTests");
-        LOADER.run("fr.upmc.r2d2.WorldTests");
+        String main = (args.length > 0) ? args[0] : Mains.DEFAULT;
+        LOADER.run(main);
     }
-
+    
     private static class GuiTranslator implements AssistantLoader.ISimpleTranslator  {
         
         public static final String TBOARD_EXT = "TeleoperationBoard";

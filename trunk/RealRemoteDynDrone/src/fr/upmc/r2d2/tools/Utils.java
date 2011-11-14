@@ -16,7 +16,7 @@ import java.io.OutputStream;
  */
 public class Utils {
 
-    private static boolean verbose = true, logs = false;
+    private static boolean trace = true, logs = false;
     
     /**
      * Debug
@@ -24,7 +24,7 @@ public class Utils {
      * @param t 
      */
     public static void print(Throwable t) {
-        if (!verbose) {
+        if (!trace) {
             return;
         }
         // System.out.println(t.getMessage());
@@ -51,8 +51,8 @@ public class Utils {
      * @param verbose
      * @return 
      */
-    public static void verbose(boolean verbose) {
-        Utils.verbose = verbose;
+    public static void trace(boolean verbose) {
+        Utils.trace = trace;
     }
     
     public static void log(boolean verbose) {
@@ -70,12 +70,10 @@ public class Utils {
         try {
             InputStream ips = new FileInputStream("snippets/" + name + ".snippet");
             InputStreamReader ipsr = new InputStreamReader(ips);
-            BufferedReader br = new BufferedReader(ipsr);
-            String line;
-            while ((line = br.readLine()) != null) {
-                file += line;
+            try (BufferedReader br = new BufferedReader(ipsr)) {
+                String line = "";
+                while ((file += line) != null && (line = br.readLine()) != null /** @TODO heyhey */) {}
             }
-            br.close();
         } catch (Exception e) {
             Utils.print(e);
         }
@@ -92,14 +90,14 @@ public class Utils {
     public static String serialize(Object o) {
         final StringBuffer s = new StringBuffer();
         try {
-            ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
-                @Override
-                public void write(int b) throws IOException {
-                    s.append((char) b);
-                }
-            });
-            oos.writeObject(o);
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
+                     @Override
+                     public void write(int b) throws IOException {
+                         s.append((char) b);
+                     }
+                 })) {
+                oos.writeObject(o);
+            }
         } catch (Exception e) {
         } finally {
             return s.toString();
