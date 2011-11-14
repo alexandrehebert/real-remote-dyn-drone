@@ -23,8 +23,6 @@ public class MainTests {
     private Class<World> word;
     private Robot first, another;
     
-    private static final boolean SHOW_UI = false;
-    
     public static void main(String... args) throws Exception {
         // petit bidule pour tout de même évaluer les tests junit malgré javassist
         final MainTests mainTests = new MainTests();
