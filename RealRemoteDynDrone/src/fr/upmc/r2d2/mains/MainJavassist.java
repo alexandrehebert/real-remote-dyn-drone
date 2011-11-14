@@ -24,6 +24,7 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
+import static fr.upmc.r2d2.tools.Utils.Block;
 
 /**
  * @author Alexandre Hebert
@@ -56,7 +57,7 @@ public class MainJavassist {
                     .append(".class, new ")
                     .append(robotType)
                     .append(TBOARD_EXT + "(this, sizeX - 50));\n");
-            System.out.println("> create board :\n\t" + robotType + TBOARD_EXT);
+            Block.print("> create board :\n\t" + robotType + TBOARD_EXT);
             debug += "\tboard " + robotType + "\n";
         }
         
@@ -76,7 +77,7 @@ public class MainJavassist {
                 @Override
                 public void run() throws Exception {
                     
-                    System.out.println("> process boards :\n" + debug + "> inserting code in DynGUI");
+                    Block.print("> process boards :\n" + debug + "> inserting code in DynGUI");
                     Utils.log(boards.toString());
                     cc.getConstructors()[0].insertAfter(boards.toString());
                     cc.writeFile();
@@ -227,7 +228,7 @@ public class MainJavassist {
             this.pool = robot.getClassPool();
             pool.importPackage("java.util.concurrent");
             pool.importPackage("java.lang.Thread");
-            System.out.println("> process annotations :");
+            Block.print("> process annotations :");
         }
 
         /**
@@ -253,7 +254,7 @@ public class MainJavassist {
             if (!groupPanels.containsKey(groupName)) {
                 groupPanels.put(groupName, new StringBuffer("GroupPanel "+ groupName + " = new GroupPanel(\""+ groupName +"\");"
                         + "panels.add(" + groupName + ");"));
-                System.out.println("\tgroup " + groupName);
+                Block.print("\tgroup " + groupName);
             }
             
             groupPanels.get(groupName)
@@ -375,7 +376,7 @@ public class MainJavassist {
             } // si on ne trouve pas la méthode tant pis, pas besoin de faire remonter d'exception
 
             AnnotationPrinter ap = new AnnotationPrinter(a);
-            System.out.println("\t" + ap + " " + name.substring(3));
+            Block.print("\t" + ap + " " + name.substring(3));
 
             switch (ap.getType()) {
                 case ACTUATOR:
@@ -403,12 +404,12 @@ public class MainJavassist {
             robot.setInterfaces(new CtClass[]{LOADER.getCtClass(pool, "fr.upmc.dtgui.robot.InstrumentedRobot")});
             
             //if (hasSensors()) {
-                System.out.println("\tclass " + robot.getSimpleName() + SENDER_EXT);
+                Block.print("\tclass " + robot.getSimpleName() + SENDER_EXT);
                 makeSensors();
             //}
             
             //if (hasActuators()) { on doit créé une queue dans tous les cas, qu'elle soit vide ou non
-                System.out.println("\tclass " + robot.getSimpleName() + RECEPTOR_EXT);
+                Block.print("\tclass " + robot.getSimpleName() + RECEPTOR_EXT);
                 makeActuators();
             //}
             
@@ -560,8 +561,8 @@ public class MainJavassist {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getName().equals("make")) {
-                System.out.println("> make " + robot.getSimpleName() + " data queues :");
-                System.out.println("\tpackage " + robot.getPackageName());
+                Block.print("> make " + robot.getSimpleName() + " data queues :");
+                Block.print("\tpackage " + robot.getPackageName());
             }
             return method.invoke(this, args);
         }

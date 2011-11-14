@@ -17,6 +17,7 @@ import java.io.OutputStream;
 public class Utils {
 
     private static boolean trace = true, logs = false;
+    public static final int DEBUG_WIDTH = 71;
     
     /**
      * Debug
@@ -30,6 +31,10 @@ public class Utils {
         // System.out.println(t.getMessage());
         System.err.println(t);
         t.printStackTrace(System.err);
+    }
+    
+    public static void print(String s) {
+        Block.print(s);
     }
     
     private static StringBuffer logger = new StringBuffer();
@@ -111,23 +116,78 @@ public class Utils {
      * @param b
      * @throws Exception 
      */
-    public static void block(String name, Block b) throws Exception {
-        System.out.println("-------------------------------------------------");
-        System.out.println("|\t" + whiteSpacesCompletion(name, 40) + "|");
-        System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - -");
+    public static void block(String name, Utils.Block b) throws Exception {
+        System.out.println();
+        System.out.println(charCompletion("/", "=") + "\\");
+        System.out.println(whiteSpacesCompletion("|    " + name) + "|");
+        b.line();
+        System.out.println();
         b.run();
-        System.out.println("-------------------------------------------------");
+        System.out.println();
+        System.out.println(charCompletion("\\", "=") + "/");
         System.out.println();
     }
     
-    public static String whiteSpacesCompletion(String v, int size) {
-        if (v.length() == size) return v;
-        if (v.length() > size) return v.substring(0, size - 3) + "...";
-        return whiteSpacesCompletion(v + " ", size);
+    public static String whiteSpacesCompletion(String v) {
+        return charCompletion(v, " ", DEBUG_WIDTH);
     }
     
-    public static interface Block /*extends Runnable*/ {
-        void run() throws Exception;
+    public static String charCompletion(String v, String c) {
+        return charCompletion(v, c, DEBUG_WIDTH);
+    }
+    
+    public static String whiteSpacesCompletion(String v, int size) {
+        return charCompletion(v, " ", size);
+    }
+    
+    public static String charCompletion(String v, String c, int size) {
+        if (v.length() == size) return v;
+        if (v.length() > size) return v.substring(0, size - 3) + "...";
+        return charCompletion(v + c, c, size);
+    }
+    
+    public static abstract class Block /*extends Runnable*/ {
+        private String label = "";
+        private int errs = 0;
+        abstract public void run() throws Exception;
+        public void line() {
+            System.out.println(charCompletion("+", "-") + "+");
+        }
+        public static void print() {
+            System.out.println();
+        }
+        public static void flush() {
+            System.out.flush();
+            System.err.flush();
+        }
+        public static void print(String s) {
+            //System.out.println(whiteSpacesCompletion("| " + s, DEBUG_WIDTH - 1) + " |");
+            System.out.println(/*"| " + */s);
+        }
+        public static void state(String state) {
+            System.out.println(Utils.whiteSpacesCompletion("[ " + state, DEBUG_WIDTH-1) + " ]");
+        }
+        public void go(String label, String more) {
+            this.label = label;
+            state("RUN " + label + " - " + more);
+        }
+        public void go(String label) {
+            this.label = label;
+            state("RUN " + label);
+        }
+        public void pass() {
+            state("PASS " + label);
+        }
+        public void err(Throwable t) {
+            state(t.getMessage());
+            t.printStackTrace();
+        }
+        public void err(String s) {
+            state("ERR " + (++errs) + " " + s);
+        }
+        public int errors() {
+            return errs;
+        }
     }
     
     
