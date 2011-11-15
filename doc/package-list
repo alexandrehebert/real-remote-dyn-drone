@@ -1,0 +1,11 @@
+fr.upmc.r2d2
+fr.upmc.r2d2.boards
+fr.upmc.r2d2.components
+fr.upmc.r2d2.components.controllers
+fr.upmc.r2d2.components.displays
+fr.upmc.r2d2.exceptions
+fr.upmc.r2d2.mains
+fr.upmc.r2d2.robots
+fr.upmc.r2d2.tests
+fr.upmc.r2d2.tests.annotations
+fr.upmc.r2d2.tools
