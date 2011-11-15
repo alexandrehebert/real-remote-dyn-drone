@@ -26,12 +26,13 @@ public class RobotFactory {
      * @param args
      * @return null si le robot n'est pas instancié correctement
      */
+    @SuppressWarnings("UseSpecificCatch")
     public static InstrumentedRobot make(Class robotClass, Object... args) {
         List<Class> cargs = new ArrayList();
         
         for(Object arg : args) {
             /**
-             * @TODO solution temporaire pour pallier au type primitif
+             * solution temporaire pour pallier au type primitif
              */
             cargs.add(Utils.class2primitive(arg.getClass()));
         }

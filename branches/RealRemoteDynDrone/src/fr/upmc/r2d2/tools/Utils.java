@@ -87,7 +87,8 @@ public class Utils {
             InputStreamReader ipsr = new InputStreamReader(ips);
             try (BufferedReader br = new BufferedReader(ipsr)) {
                 String line = "";
-                while ((file += line) != null && (line = br.readLine()) != null /** @TODO heyhey */) {}
+                // qui a dit qu'on ne pouvait pas lire un fichier en une seule ligne de java ? :D
+                while ((file += line) != null && (line = br.readLine()) != null) {}
             }
         } catch (Exception e) {
             Utils.print(e);

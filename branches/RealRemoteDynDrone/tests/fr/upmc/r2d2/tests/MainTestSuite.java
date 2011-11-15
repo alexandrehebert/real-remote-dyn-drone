@@ -4,7 +4,6 @@
  */
 package fr.upmc.r2d2.tests;
 
-import fr.upmc.r2d2.tests.MainTests;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

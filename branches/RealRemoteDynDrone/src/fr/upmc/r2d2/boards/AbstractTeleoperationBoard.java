@@ -62,6 +62,7 @@ public abstract class AbstractTeleoperationBoard
     protected final HashMap<String, AbstractDisplayPanel> displays = new HashMap();
     protected final HashMap<String, AbstractControllerPanel> controllers = new HashMap();
 
+    @SuppressWarnings("OverridableMethodCallInConstructor")
     public AbstractTeleoperationBoard(
             TeleoperationGUI tgui,
             int size) {
