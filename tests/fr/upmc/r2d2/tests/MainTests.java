@@ -9,7 +9,6 @@ import fr.upmc.r2d2.boards.DynGUI;
 import fr.upmc.r2d2.mains.MainJavassist;
 import fr.upmc.r2d2.robots.ActuatorCommand;
 import fr.upmc.r2d2.robots.MessageData;
-import fr.upmc.r2d2.tools.TestDetails;
 import fr.upmc.r2d2.tools.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
