@@ -1,5 +1,7 @@
 package fr.upmc.r2d2.mains;
 
+import fr.upmc.r2d2.exceptions.UsageException;
+
 /**
  * @author Alexandre Hebert
  * @author Thomas Champion
