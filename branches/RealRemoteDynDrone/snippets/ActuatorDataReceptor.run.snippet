@@ -1,0 +1,10 @@
+public void run() {
+    ActuatorCommand ac = new ActuatorCommand(robot);
+    while (true) {
+        try {
+            ac.perform((MessageData) this.dataQueue.take());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
