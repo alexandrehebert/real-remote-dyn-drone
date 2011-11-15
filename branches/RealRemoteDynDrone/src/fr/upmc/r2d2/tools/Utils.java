@@ -19,6 +19,7 @@ import java.util.List;
 public class Utils {
 
     private static boolean trace = true, logs = false;
+    private static StringBuffer logger = new StringBuffer();
     public static final int DEBUG_WIDTH = 71;
     
     /**
@@ -47,8 +48,6 @@ public class Utils {
         Block.print(s);
     }
     
-    private static StringBuffer logger = new StringBuffer();
-    
     public static void log(String l) {
         if (logger.length() == 0)
             Runtime.getRuntime().addShutdownHook(new Thread(){
@@ -64,12 +63,16 @@ public class Utils {
      * Affiche ou non les exceptions catchées pas l'assistant
      * 
      * @param verbose
-     * @return 
      */
     public static void trace(boolean verbose) {
         Utils.trace = trace;
     }
     
+    /**
+     * Affiche ou non les logs
+     * 
+     * @param verbose 
+     */
     public static void log(boolean verbose) {
         Utils.logs = verbose;
     }

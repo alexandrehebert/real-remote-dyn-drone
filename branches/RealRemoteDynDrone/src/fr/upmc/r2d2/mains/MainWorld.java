@@ -13,6 +13,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/**
+ * 
+ * 
+ * @author Alexandre Hebert
+ * @author Thomas Champion
+ */
 public class MainWorld {
 
     public static void main(String[] args) throws Exception {
@@ -24,6 +30,7 @@ public class MainWorld {
         world.start();
         System.out.println("$ world running");
     }
+    
 }
 
 class ApplicationController extends JFrame {
@@ -99,6 +106,7 @@ class ApplicationController extends JFrame {
         public void actionPerformed(ActionEvent e) {
             System.exit(0);
         }
+        
     }
     
 }

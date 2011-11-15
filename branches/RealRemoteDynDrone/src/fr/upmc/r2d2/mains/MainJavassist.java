@@ -27,6 +27,8 @@ import javassist.CtMethod;
 import static fr.upmc.r2d2.tools.Utils.Block;
 
 /**
+ * Ensemble du code de génération de code : méta-code ? :DDDD
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
