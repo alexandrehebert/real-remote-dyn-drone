@@ -9,6 +9,7 @@ import fr.upmc.r2d2.boards.DynGUI;
 import fr.upmc.r2d2.mains.MainJavassist;
 import fr.upmc.r2d2.robots.ActuatorCommand;
 import fr.upmc.r2d2.robots.MessageData;
+import fr.upmc.r2d2.tests.annotations.TestDetails;
 import fr.upmc.r2d2.tools.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -56,6 +57,7 @@ public class MainTests extends TestCase {
         Utils.block("Tests", new Utils.Block() {
             
             @Override
+            @SuppressWarnings("UseSpecificCatch")
             public void run() {
 
                 /**
@@ -156,6 +158,7 @@ public class MainTests extends TestCase {
     
     @Test
     @TestDetails(order=2,description="Queues de communication fonctionnelles ?")
+    @SuppressWarnings("UseSpecificCatch")
     public void testSensorQueues() throws Exception {
         
         Robot r = robots[FIRST];
@@ -170,7 +173,7 @@ public class MainTests extends TestCase {
             testQueue = (BlockingQueue)f.get(sdsTest);
             Vector<MessageData> mds = new Vector();
             int cpt = 0;
-            testQueue.add(new MessageData("TEST_GROUP", "testMethod", new String("TestValue")));
+            testQueue.add(new MessageData("TEST_GROUP", "testMethod", "TestValue"));
             while ((testQueue.isEmpty() || testQueue.drainTo(mds) > 0) && cpt++ < 10) {
                 Thread.sleep(20);
                 System.out.println("\t> drain " + cpt + " : " + mds.size() + " messages");

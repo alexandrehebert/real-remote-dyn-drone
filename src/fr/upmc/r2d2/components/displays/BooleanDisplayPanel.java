@@ -23,7 +23,6 @@ public class BooleanDisplayPanel extends AbstractDisplayPanel<JToggleButton> {
     }
     
     /**
-     * @TODO générer progressbar ou slider en fonction de variationType
      * @return 
      */
     @Override

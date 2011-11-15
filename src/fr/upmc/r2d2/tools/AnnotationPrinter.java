@@ -13,8 +13,17 @@ import java.lang.annotation.Annotation;
  */
 public class AnnotationPrinter {
     
+    /**
+     * Type de la méthode annotée
+     */
     public static enum AnnotationType {
+        /**
+         * La méthode annotée est de type actuator
+         */
         ACTUATOR,
+        /**
+         * La méthdoe annotée est de type sensor
+         */
         SENSOR
     }
     
