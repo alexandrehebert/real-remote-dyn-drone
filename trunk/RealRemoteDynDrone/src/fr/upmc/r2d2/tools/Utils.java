@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Utilitaires
@@ -31,6 +33,14 @@ public class Utils {
         // System.out.println(t.getMessage());
         System.err.println(t);
         t.printStackTrace(System.err);
+    }
+    
+    public static void print(List<?> list) {
+        if (list.isEmpty()) print("[]");
+        StringBuilder sb = new StringBuilder("[" + list.get(0));
+        for (Object o : list.subList(1, list.size()))
+            sb.append(", ").append(o);
+        System.out.println(sb + "]");
     }
     
     public static void print(String s) {
@@ -165,7 +175,10 @@ public class Utils {
             System.out.println(/*"| " + */s);
         }
         public static void state(String state) {
-            System.out.println(Utils.whiteSpacesCompletion("[ " + state, DEBUG_WIDTH-1) + " ]");
+            state(state, System.out);
+        }
+        public static void state(String state, PrintStream stream) {
+            stream.println(Utils.whiteSpacesCompletion("[ " + state, DEBUG_WIDTH-1) + " ]");
         }
         public void go(String label, String more) {
             this.label = label;
@@ -179,11 +192,12 @@ public class Utils {
             state("PASS " + label);
         }
         public void err(Throwable t) {
-            state(t.getMessage());
+            err(t.getCause() + "");
             t.printStackTrace();
         }
         public void err(String s) {
-            state("ERR " + (++errs) + " " + s);
+            flush();
+            state("ERR" + (++errs) + " " + s, System.err);
         }
         public int errors() {
             return errs;
