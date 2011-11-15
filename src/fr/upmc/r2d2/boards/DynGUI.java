@@ -9,7 +9,7 @@ import java.awt.HeadlessException;
 import java.util.HashMap;
 
 /**
- * 
+ * DynGUI héberge l'ensemble du code d'instanciation des différents TBoards
  * 
  * @author Alexandre Hebert
  * @author Thomas Champion
@@ -48,6 +48,12 @@ public class DynGUI extends TeleoperationGUI {
          */
     }
     
+    /**
+     * Recherche et créé le TBoard associé au robot passé en paramètre
+     * 
+     * @param r robot correspondant au board
+     * @return 
+     */
     public RobotTeleoperationBoard createBoard(InstrumentedRobot r) {
         return checkBoard(r.getClass());
     }
@@ -61,6 +67,13 @@ public class DynGUI extends TeleoperationGUI {
                 this.absoluteX, this.absoluteY, this.controlRadius);
     }
 
+    /**
+     * Teste si le robot est supporté par le DynGUI
+     * Stoppe l'execution si le TBoard n'est pas trouvé
+     * 
+     * @param r classe de robot testée
+     * @return 
+     */
     public RobotTeleoperationBoard checkBoard(Class<? extends Robot> r) {
         if (!boards.containsKey(r)) {
             // TODO: create an exception type

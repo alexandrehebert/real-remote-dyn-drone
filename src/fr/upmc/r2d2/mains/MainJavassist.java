@@ -45,12 +45,24 @@ public class MainJavassist {
         LOADER.run(main);
     }
     
+    /**
+     * Translator qui se charge de l'ensemble de la génération de code associée au DynGUI
+     * On ajoute l'instanciation des TBoards et leur stockage dans une table de hachage
+     * On pourra ainsi les récupérer en fonction du robot détécté
+     */
     private static class GuiTranslator implements AssistantLoader.ISimpleTranslator  {
         
         public static final String TBOARD_EXT = "TeleoperationBoard";
         private StringBuffer boards = new StringBuffer();
         private String debug = "";
         
+        /**
+         * Ajout d'un TBoard à la liste globale des TBoards
+         * Le TBoard est identifié par le nom complet de la classe du robot
+         * correspondant
+         * 
+         * @param robotType canonicalName du robot pour lequel on veut créer un TBoard
+         */
         public void addBoard(String robotType) {
             boards.append("boards.put(")
                     .append(robotType)
@@ -508,16 +520,23 @@ public class MainJavassist {
          * OUTILS
          *******************************************************/
         
+        /**
+         * @return true si le robot a des sensors
+         */
         public boolean hasSensors() {
             return robot.hasAnnotation(WithSensors.class);
         }
-
+        
+        /**
+         * @return true si le robot a des actuators
+         */
         public boolean hasActuators() {
             return robot.hasAnnotation(WithActuators.class);
         }
 
         /**
          * Créer une nouvelle classe de DataQueue
+         * 
          * @param ext
          * @param size
          * @return
@@ -567,21 +586,5 @@ public class MainJavassist {
             return method.invoke(this, args);
         }
     }
-
-    /*
-     * private static class WorldTranslator implements AssistantLoader.ISimpleTranslator {
-
-        @Override
-        public void onLoad(ClassPool cp, String string, CtClass c) throws Exception {
-
-            Utils.block("<<< World >>>", new Utils.Block() {
-
-                @Override
-                public void run() throws Exception {
-                }
-            });
-        }
-    }
-     */
     
 }

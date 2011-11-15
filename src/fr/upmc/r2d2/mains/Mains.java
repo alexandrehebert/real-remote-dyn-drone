@@ -11,7 +11,7 @@ public class Mains {
     // public static final String JAVASSIST = "fr.upmc.r2d2.Javassist";
     public static final String DEFAULT = "fr.upmc.r2d2.mains.MainWorld";
     public static final String ORIGINAL = "fr.upmc.dtgui.example.WorldTests";
-    public static final String TESTS = "fr.upmc.r2d2.mains.MainTests";
+    public static final String TESTS = "fr.upmc.r2d2.tests.MainTests";
     public static final String[] MAINS = new String[] {DEFAULT, ORIGINAL, TESTS};
     
     /**

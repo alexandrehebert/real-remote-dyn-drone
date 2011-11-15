@@ -16,6 +16,9 @@ public abstract class AbstractDisplayPanel<J extends JComponent> extends Abstrac
         super(groupName, methodName, minRate, maxRate);
     }
 
+    /**
+     * Génère le contrôle associé au composant
+     */
     public void generateComponent() {
         super.generateComponent();
         component.setEnabled(false);
@@ -26,7 +29,7 @@ public abstract class AbstractDisplayPanel<J extends JComponent> extends Abstrac
     /**
      * On veut rafraichir le controle en fonction de la nouvelle valeur reçue
      * 
-     * @param sd 
+     * @param sd nouvelle valeur
      */
     public abstract void update(Object sd);
     

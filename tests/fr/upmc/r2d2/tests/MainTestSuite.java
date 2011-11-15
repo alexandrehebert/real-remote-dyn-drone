@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.upmc.r2d2.mains;
+package fr.upmc.r2d2.tests;
 
-import fr.upmc.r2d2.mains.MainTests;
+import fr.upmc.r2d2.tests.MainTests;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

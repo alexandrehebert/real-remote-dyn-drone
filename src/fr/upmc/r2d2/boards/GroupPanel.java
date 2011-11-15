@@ -15,6 +15,9 @@ public class GroupPanel extends JPanel {
 
     protected int height = 0, width = 0;
 
+    /**
+     * @param name libellé du groupe
+     */
     public GroupPanel(String name) {
         super.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         
@@ -29,7 +32,7 @@ public class GroupPanel extends JPanel {
     /**
      * Ajout d'un contrôle à la liste des contrôles existants du groupe
      * 
-     * @param p
+     * @param p composant à ajouter
      * @return 
      */
     protected final GroupPanel addComponent(JPanel p) {
@@ -42,7 +45,7 @@ public class GroupPanel extends JPanel {
      * Ajustement de la taille du composant à partir de la taille du nouveau
      * contrôle ajouté
      * 
-     * @param p 
+     * @param p patron d'ajustement
      */
     private void adjust(JPanel p) {
         height += p.getHeight();

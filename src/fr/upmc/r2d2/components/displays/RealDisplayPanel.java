@@ -6,6 +6,8 @@ import fr.upmc.r2d2.components.JComponentFactory;
 import javax.swing.JSlider;
 
 /**
+ * Display associé à un senseur de type réel
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

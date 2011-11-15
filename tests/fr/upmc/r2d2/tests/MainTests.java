@@ -1,4 +1,4 @@
-package fr.upmc.r2d2.mains;
+package fr.upmc.r2d2.tests;
 
 import fr.upmc.dtgui.example.World;
 import fr.upmc.dtgui.robot.InstrumentedRobot;
@@ -6,6 +6,7 @@ import fr.upmc.dtgui.tests.AnotherLittleRobot;
 import fr.upmc.dtgui.tests.LittleRobot;
 import fr.upmc.dtgui.robot.Robot;
 import fr.upmc.r2d2.boards.DynGUI;
+import fr.upmc.r2d2.mains.MainJavassist;
 import fr.upmc.r2d2.robots.ActuatorCommand;
 import fr.upmc.r2d2.robots.MessageData;
 import fr.upmc.r2d2.tools.TestDetails;

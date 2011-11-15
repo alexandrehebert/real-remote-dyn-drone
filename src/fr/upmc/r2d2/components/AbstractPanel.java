@@ -21,6 +21,13 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
     private String methodName;
     protected double minRate, maxRate;    
     
+
+    /**
+     * @param groupName nom de groupe, contenu dans l'annotation
+     * @param methodName nom de la méthode associée au controller
+     * @param minRate taux de rafraichissement mininum
+     * @param maxRate taux de fafraichissement maximum
+     */
     public AbstractPanel(String groupName, String methodName, double minRate, double maxRate) {
         super();
         
@@ -60,7 +67,7 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
      * Par défaut le titre du controle est le nom de la méthode associée à l'actuateur
      * ou au senseur privé de "set" ou "get"
      * 
-     * @return 
+     * @return titre du composant
      */
     public String createTitle() {
         return getMethodName().substring(3);
@@ -76,6 +83,8 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
     public abstract J createComponent();
 
     /**
+     * Nom du groupe de l'annotation rattachée au contrôle
+     * 
      * @return the groupName
      */
     public final String getGroupName() {
@@ -83,6 +92,8 @@ public abstract class AbstractPanel<J extends JComponent> extends JPanel {
     }
 
     /**
+     * Nom de la méthode rattachée au contrôle
+     * 
      * @return the methodName
      */
     public final String getMethodName() {

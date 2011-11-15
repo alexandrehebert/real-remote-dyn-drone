@@ -3,6 +3,8 @@ package fr.upmc.r2d2.components.displays;
 import fr.upmc.dtgui.annotations.VariationType;
 
 /**
+ * Display associé à un senseur de type entier
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

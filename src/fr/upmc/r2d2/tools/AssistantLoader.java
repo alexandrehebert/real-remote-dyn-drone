@@ -17,6 +17,9 @@ import javassist.Translator;
  * Surcouche à Javassist permettant de s'abstraire d'un certain nombre de
  * mécanismes verbeux inhérents à cette API, y compris des try...catch à répétition
  * 
+ * A noter l'ajout du support de multiples translators sur le Loader d'origine
+ * ainsi que la simplification de certains appels de méthodes au niveau de javassist
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

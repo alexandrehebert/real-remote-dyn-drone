@@ -16,8 +16,12 @@ public class PositioningDataFactory {
     private final String labely = "getY";
     private final String labeld = "getDirection";
     
-    private static PositioningDataFactory uniq = new PositioningDataFactory();
+    /**
+     * @return singleton
+     */
     public static PositioningDataFactory getInstance() { return uniq; }
+    private PositioningDataFactory() {}
+    private static PositioningDataFactory uniq = new PositioningDataFactory();
 
     /*public static enum PositioningDataAttribute {
 
@@ -43,7 +47,7 @@ public class PositioningDataFactory {
      * PositioningData, qui nous sera indispensable pour l'affichage du robot 
      * dans l'univers
      * 
-     * @param data
+     * @param data donnée "mangée"
      * @return 
      */
     public PositioningData eat(MessageData data) {
