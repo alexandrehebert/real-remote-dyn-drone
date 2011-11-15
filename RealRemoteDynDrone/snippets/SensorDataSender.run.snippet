@@ -1,18 +1,19 @@
 public void run() {
-    while (true) {
-        if (dataQueue == null)
-            System.out.println("DataQueue vide !");
+    boolean run = true;
+    while (run) {
 
-        if (robot == null) {
-            System.out.println("Robot vide !");
-        }
+        if (dataQueue == null) System.out.println("DataQueue vide !");
+        if (robot == null) System.out.println("Robot vide !");
 
         dataQueue.clear();
         #TMPQUEUE#
+
         try {
             Thread.sleep((long)sleep);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Thread.currentThread().interrupt();
+            run = false;
         }
+
     }
 }
