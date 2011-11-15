@@ -6,12 +6,13 @@ import fr.upmc.r2d2.components.JComponentFactory;
 import fr.upmc.r2d2.robots.MessageData;
 import java.util.EventListener;
 import java.util.concurrent.BlockingQueue;
-import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * Controller associé à un actuateur de type booléen
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

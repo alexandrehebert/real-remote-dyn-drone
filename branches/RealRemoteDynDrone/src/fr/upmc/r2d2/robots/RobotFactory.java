@@ -24,7 +24,7 @@ public class RobotFactory {
      * 
      * @param robotClass
      * @param args
-     * @return 
+     * @return null si le robot n'est pas instancié correctement
      */
     public static InstrumentedRobot make(Class robotClass, Object... args) {
         List<Class> cargs = new ArrayList();

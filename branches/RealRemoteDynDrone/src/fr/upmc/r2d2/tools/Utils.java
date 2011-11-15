@@ -156,49 +156,69 @@ public class Utils {
         return charCompletion(v + c, c, size);
     }
     
+    /**
+     * Classe d'affichage esthétique des debugs et autres
+     * En définissant la méthode run, on admet que l'ensemble des affichages produit
+     * à l'intérieur de son appel seront encapsulés dans un joli petit bloc bien
+     * indenté
+     */
     public static abstract class Block /*extends Runnable*/ {
+        
         private String label = "";
         private int errs = 0;
+        
         abstract public void run() throws Exception;
+        
         public void line() {
             System.out.println(charCompletion("+", "-") + "+");
         }
+        
         public static void print() {
             System.out.println();
         }
+        
         public static void flush() {
             System.out.flush();
             System.err.flush();
         }
+        
         public static void print(String s) {
             //System.out.println(whiteSpacesCompletion("| " + s, DEBUG_WIDTH - 1) + " |");
             System.out.println(/*"| " + */s);
         }
+        
         public static void state(String state) {
             state(state, System.out);
         }
+        
         public static void state(String state, PrintStream stream) {
             stream.println(Utils.whiteSpacesCompletion("[ " + state, DEBUG_WIDTH-1) + " ]");
         }
+        
         public void go(String label, String more) {
             this.label = label;
             state("RUN " + label + " - " + more);
         }
+        
         public void go(String label) {
             this.label = label;
             state("RUN " + label);
         }
+        
         public void pass() {
             state("PASS " + label);
         }
+        
         public void err(Throwable t) {
             err(t.getCause() + "");
             t.printStackTrace();
         }
+        
         public void err(String s) {
             flush();
             state("ERR" + (++errs) + " " + s, System.err);
         }
+        
         public int errors() {
             return errs;
         }
@@ -208,8 +228,9 @@ public class Utils {
     /**
      * Convertit les classes wrappers (Double, Integer etc...) en classe de type 
      * primitifs (double, int etc.)
-     * @param c
-     * @return 
+     * 
+     * @param c classe wrapper
+     * @return classe primitive
      */
     public static Class class2primitive(Class c) {
         if (c == Double.class)
@@ -223,5 +244,6 @@ public class Utils {
         if (c == Byte.class)
             return byte.class;
         return c;
-    }    
+    }
+    
 }

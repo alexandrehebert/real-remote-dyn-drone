@@ -4,11 +4,12 @@ import fr.upmc.r2d2.boards.AbstractTeleoperationBoard.ActuatorDataSender;
 import fr.upmc.r2d2.robots.MessageData;
 import java.util.EventListener;
 import java.util.concurrent.BlockingQueue;
-import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * Controller associé à un actuateur de type entier
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

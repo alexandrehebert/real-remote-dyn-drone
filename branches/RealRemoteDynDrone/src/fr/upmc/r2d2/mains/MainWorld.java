@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-
 public class MainWorld {
 
     public static void main(String[] args) throws Exception {
@@ -26,6 +25,7 @@ public class MainWorld {
         System.out.println("$ world running");
     }
 }
+
 class ApplicationController extends JFrame {
 
     private static final long serialVersionUID = 1L;

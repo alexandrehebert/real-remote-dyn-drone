@@ -10,7 +10,9 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-/**
+/** 
+ * Controller associé à un actuateur de type réel
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

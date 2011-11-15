@@ -5,6 +5,8 @@ import fr.upmc.r2d2.components.JComponentFactory;
 import javax.swing.JToggleButton;
 
 /**
+ * Display associé à un senseur de type booléen
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */

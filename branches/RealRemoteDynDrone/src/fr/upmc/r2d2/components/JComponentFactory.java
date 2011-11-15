@@ -1,7 +1,5 @@
 package fr.upmc.r2d2.components;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 import javax.swing.JSlider;
@@ -10,6 +8,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * Utilitaire de fabrication des composants
+ * On factorise ainsi le code de génération des sliders qui auront le même look
+ * and feel quel que soit la situation
+ * 
  * @author Alexandre Hebert
  * @author Thomas Champion
  */
@@ -18,6 +20,13 @@ public class JComponentFactory {
     public static final String TBUTTON_ON = "On";
     public static final String TBUTTON_OFF = "Off";
     
+    /**
+     * Génère un JSlider
+     * 
+     * @param minRange taux de rafraichissement minimum
+     * @param maxRange taux de fafraichissement maximum
+     * @return JSlider généré
+     */
     public static JSlider makeSlider(double minRange, double maxRange) {
         DefaultBoundedRangeModel model = new DefaultBoundedRangeModel(0, 0, (int) minRange, (int) maxRange);   
         JSlider js = new JSlider(model);
@@ -34,6 +43,12 @@ public class JComponentFactory {
         return js;
     }
     
+    /**
+     * Génère un JToggleButton
+     * 
+     * @param state état par défaut du bouton
+     * @return JToggleButton généré
+     */
     public static JToggleButton makeToggleButton(boolean state) {
         return makeToggleButton(TBUTTON_ON, TBUTTON_OFF, state);
     }
@@ -52,6 +67,13 @@ public class JComponentFactory {
         return jtp;
     }
     
+    /**
+     * Génère un JProgressBar
+     * 
+     * @param minRange taux de rafraichissement minimum
+     * @param maxRange taux de fafraichissement maximum
+     * @return JProgressBar généré
+     */
     public static JProgressBar makeProgressBar(double minRange, double maxRange) {
         return makeProgressBar(minRange, maxRange, 0);
     }
