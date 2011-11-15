@@ -14,6 +14,12 @@ public class Mains {
     public static final String TESTS = "fr.upmc.r2d2.mains.MainTests";
     public static final String[] MAINS = new String[] {DEFAULT, ORIGINAL, TESTS};
     
+    /**
+     * Selection du main à lancer au démarrage
+     * 
+     * @param args
+     * @throws Throwable 
+     */
     public static void main(String[] args) throws Throwable {
         if (args.length != 1) {
             System.out.println("mains :");
