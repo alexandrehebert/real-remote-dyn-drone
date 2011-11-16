@@ -60,7 +60,15 @@ public class AssistantLoader extends Loader {
      * pour une ou plusieurs classes donnée(s). Ce translator sera averti
      * uniquement si la classe chargée est l'une des classes de la liste transmise
      * 
+     * Synthaxe des filtres :
+     * <ul>
+     *  <li>Classe annotée : @chemin.vers.mon.Annotation</li>
+     *  <li>Classe : chemin.vers.ma.Classe</li>
+     *  <li>Package : chemin.vers.mon.package.*</li>
+     * </ul>
+     *
      * @param t translator à ajouter
+     * @param s filtres
      * @return 
      */
     public AssistantLoader addTranslator(ISimpleTranslator t, String... s) {
@@ -82,7 +90,9 @@ public class AssistantLoader extends Loader {
      * pour une ou plusieurs classes donnée(s). Ce translator sera averti
      * uniquement si la classe chargée est l'une des classes de la liste transmise
      * 
+     * @see AssistantLoader#addTranslator(fr.upmc.r2d2.tools.AssistantLoader.ISimpleTranslator, java.lang.String[]) 
      * @param t translator à ajouter
+     * @param s filtres
      * @return 
      */
     public AssistantLoader addTranslator(Translator t, String... s) {
@@ -90,6 +100,11 @@ public class AssistantLoader extends Loader {
         return this;
     }
     
+    /**
+     * Lancement du main avec Javassist
+     * 
+     * @param main à lancer
+     */
     public void run(String main) {
         try {
             run(main, new String[] {});
@@ -97,13 +112,22 @@ public class AssistantLoader extends Loader {
             Utils.print(e);
         }
     }
-
     
     /**
      * Interface de déclaration d'un translator de type simple
      * Ce translator est averti lors du chargement d'une classe
      */
     public static interface ISimpleTranslator {
+        /**
+         * Interception du chargement d'une classe par Javassist
+         * OnLoad est appelé une et une seule fois par classe chargée, quel que soit
+         * le nombre d'instanciations dans le code client
+         * 
+         * @param cp pool de classes
+         * @param string nom complet de la classe
+         * @param c instance de CtClass de la classe
+         * @throws Exception 
+         */
         public void onLoad(ClassPool cp, String string, CtClass c) throws Exception;
     }
     
@@ -111,6 +135,12 @@ public class AssistantLoader extends Loader {
      * Ajoute le comportement onStart au [ISimpleTranslator]
      */
     public static interface IFullTranslator extends ISimpleTranslator {
+        /**
+         * Méthode appelée une et une seule fois au lancement de Javassist
+         * 
+         * @param cp pool de classes
+         * @throws Exception 
+         */
         public void onStart(ClassPool cp) throws Exception;
     }
     
@@ -127,8 +157,15 @@ public class AssistantLoader extends Loader {
             this.t = t;
         }
         
+        /**
+         * On cherche à résoudre l'appel à la méthode onStart en le déléguant 
+         * au translator wrappé si ce dernier est un FullTranslator
+         * 
+         * @see AssistantLoader$IFullTranslator
+         * @param cp pool de classes
+         */
         @Override
-        public void start(ClassPool cp) throws NotFoundException, CannotCompileException {
+        public void start(ClassPool cp) {
             try {
                 if (t instanceof IFullTranslator) ((IFullTranslator)t).onStart(cp);
             }
@@ -136,6 +173,14 @@ public class AssistantLoader extends Loader {
                 Utils.print(e);
             }
         }
+        
+        /**
+         * On cherche à résoudre l'appel à la méthode onLoad en le déléguant
+         * au translator wrappé
+         * 
+         * @param cp pool de classes
+         * @param string nom complet de la classe
+         */
         @Override
         public void onLoad(ClassPool cp, String string) {
             try {
@@ -152,6 +197,12 @@ public class AssistantLoader extends Loader {
     /**
      * Dispatche les évènements start et onLoad envoyés par javassist à tous les
      * translators ajoutés par le biais de addTranslator
+     * On peut ainsi gérer l'ajout de translators multiples qui pourront intercepter
+     * un certain nombre de chargements de classes
+     * 
+     * Les ISimpleTranslator et IFullTranslator peuvent être ajoutés avec des paramètres
+     * supplémentaires, tels que la liste 'finie' des classes dont ils désirent intercepter
+     * le chargement, ou encore un certain nombre d'autres filtres
      */
     private class DispatchTranslator implements Translator {
 
@@ -172,6 +223,16 @@ public class AssistantLoader extends Loader {
                     e.getKey().onLoad(cp, string);
         }
         
+        /**
+         * On teste s'il existe dans la liste donnée en paramètre un filtre
+         * qui correspond à la classe transmise, on teste à la fois l'egalité
+         * parfaite ou, si le filtre contient un joker -*-, on utilise le principe
+         * du "on se fiche de ce qu'il y a après le joker, on compare simplement le début"
+         * 
+         * @param string nom de la classe
+         * @param classzs filtres
+         * @return 
+         */
         private boolean testJoker(String string, List<String> classzs) {
             for (String classz : classzs) {
                 if (classz.equals(string))
@@ -183,6 +244,14 @@ public class AssistantLoader extends Loader {
             return false;
         }
         
+        /**
+         * On teste si la classe implémente ou étend de l'une des classes filtres
+         * 
+         * @param cp pool de classes
+         * @param string nom de la classe
+         * @param classzs filtres
+         * @return 
+         */
         private boolean isImplement(ClassPool cp, String string, List<String> classzs) {
             CtClass c = getCtClass(cp, string);
             
@@ -199,6 +268,15 @@ public class AssistantLoader extends Loader {
             return false;
         }
         
+        /**
+         * On cherche à savoir si la classe est annotée avec l'une des annotations contenue
+         * dans la liste des filtres
+         * 
+         * @param cp pool de classes
+         * @param string nom de la classe
+         * @param classzs filtres
+         * @return 
+         */
         private boolean testAnnotations(ClassPool cp, String string, List<String> classzs) {
             CtClass c = getCtClass(cp, string);
             

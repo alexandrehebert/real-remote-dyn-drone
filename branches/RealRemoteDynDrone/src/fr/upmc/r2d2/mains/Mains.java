@@ -32,7 +32,7 @@ public class Mains {
         try {
             int m = Integer.parseInt(args[0]);
             if (m < 0 || m >= MAINS.length) m = 0;
-            MainJavassist.main(new String[] {MAINS[m]});
+            MainJavassist.main(new String[] {MAINS[0]});
         }
         catch (Exception e) {
             System.out.println("invalid argument");

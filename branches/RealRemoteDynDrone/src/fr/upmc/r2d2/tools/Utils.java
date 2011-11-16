@@ -228,7 +228,6 @@ public class Utils {
         }
     }
     
-    
     /**
      * Convertit les classes wrappers (Double, Integer etc...) en classe de type 
      * primitifs (double, int etc.)
