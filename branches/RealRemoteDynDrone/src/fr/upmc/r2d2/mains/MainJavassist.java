@@ -1,5 +1,19 @@
 package fr.upmc.r2d2.mains;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMethod;
 import fr.upmc.dtgui.annotations.BooleanActuatorData;
 import fr.upmc.dtgui.annotations.BooleanSensorData;
 import fr.upmc.dtgui.annotations.IntegerActuatorData;
@@ -11,20 +25,7 @@ import fr.upmc.dtgui.annotations.WithSensors;
 import fr.upmc.r2d2.tools.AnnotationPrinter;
 import fr.upmc.r2d2.tools.AssistantLoader;
 import fr.upmc.r2d2.tools.Utils;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtField;
-import javassist.CtMethod;
-import static fr.upmc.r2d2.tools.Utils.Block;
+import fr.upmc.r2d2.tools.Utils.Block;
 
 /**
  * Ensemble du code de génération de code : méta-code ? :DDDD
@@ -36,6 +37,7 @@ public class MainJavassist {
 
     private static final WalkAnnotations WALKER = new WalkAnnotations();
     private static final AssistantLoader LOADER = new AssistantLoader();
+    private static final String CLASS_PATH = "bin/jassist/";
     
     private static GuiTranslator guiTranslator = new GuiTranslator();
     private static RobotTranslator robotTranslator = new RobotTranslator();
@@ -94,7 +96,7 @@ public class MainJavassist {
                     Block.print("> process boards :\n" + debug + "> inserting code in DynGUI");
                     Utils.log(boards.toString());
                     cc.getConstructors()[0].insertAfter(boards.toString());
-                    cc.writeFile();
+                    cc.writeFile(CLASS_PATH);
                 }
                 
             });
@@ -134,7 +136,8 @@ public class MainJavassist {
                      * On parcours la liste des annotations de chaque méthode
                      */
                     WALKER.walk(cc, new WalkAnnotations.IAnnotationWalker() {
-                        public void walk(CtMethod m, Annotation a) throws Exception {
+                        @Override
+						public void walk(CtMethod m, Annotation a) throws Exception {
                             /**
                              * On cherche à résoudre l'annotation dans la liste de nos
                              * méthodes de traitement
@@ -427,7 +430,7 @@ public class MainJavassist {
                 makeActuators();
             //}
             
-            robot.writeFile();
+            robot.writeFile(CLASS_PATH);
             
             /* créer le tboard associé */
             makeBoard();
@@ -455,7 +458,7 @@ public class MainJavassist {
             dataSender.addMethod(CtMethod.make(Utils.readSnippet(SENDER_EXT + ".start"), dataSender));
             dataSender.addMethod(CtMethod.make(run, dataSender));
 
-            dataSender.writeFile();
+            dataSender.writeFile(CLASS_PATH);
 
             /* 
              * Création d'une instance de SensorSender pour le robot, 
@@ -482,7 +485,7 @@ public class MainJavassist {
             dataReceptor.addMethod(CtMethod.make(Utils.readSnippet(RECEPTOR_EXT + ".start"), dataReceptor));
             dataReceptor.addMethod(CtMethod.make(Utils.readSnippet(RECEPTOR_EXT + ".run"), dataReceptor));         
             
-            dataReceptor.writeFile();
+            dataReceptor.writeFile(CLASS_PATH);
 
             /* 
              * Création d'une instance de ActuatorReceptor pour le robot, 
@@ -515,7 +518,7 @@ public class MainJavassist {
             Utils.log(gpanels.toString());
             
             board.addMethod(CtMethod.make("public void createPanels() { "+ gpanels.toString() +" }", board));
-            board.writeFile();
+            board.writeFile(CLASS_PATH);
         }
         
         /*******************************************************
