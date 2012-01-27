@@ -43,8 +43,4 @@ public class BooleanControllerPanel extends AbstractControllerPanel<JToggleButto
         component.removeChangeListener((ChangeListener) el);
     }
     
-    public String toString() {
-        return super.toString();
-    }
-    
 }

@@ -30,4 +30,9 @@ public class IntegerControllerPanel extends RealControllerPanel {
         return cl;
     }
     
+    @Override
+    public void disconnect(EventListener el) {
+        component.removeChangeListener((ChangeListener) el);
+    }
+    
 }

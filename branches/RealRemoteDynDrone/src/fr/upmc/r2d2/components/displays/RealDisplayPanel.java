@@ -46,6 +46,7 @@ public class RealDisplayPanel extends AbstractDisplayPanel<JSlider> {
     /**
      * @return 
      */
+    @Override
     public String createTitle() {
         return super.createTitle() + " (" + unit + ")";
     }
