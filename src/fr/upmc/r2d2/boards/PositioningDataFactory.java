@@ -23,7 +23,7 @@ public class PositioningDataFactory {
     private PositioningDataFactory() {}
     private static PositioningDataFactory uniq = new PositioningDataFactory();
 
-    /*public static enum PositioningDataAttribute {
+    public static enum PositioningDataAttribute {
 
         X, Y, DIRECTION, EX;
 
@@ -36,7 +36,7 @@ public class PositioningDataFactory {
             return PositioningDataAttribute.EX;
         }
         
-    }*/
+    }
     
     private Double x, y, d;
     private int stamp = 0;
@@ -52,21 +52,30 @@ public class PositioningDataFactory {
      */
     public PositioningData eat(MessageData data) {
         if (!data.getGroupName().equals("position")) return null;
-       /*switch (PositioningDataAttribute.toAttrType(data.getKey())) {
-            case X: 
-            default:
-                break;
-        }*/
         
-        switch (data.getKey()) {
+        
+        // syntaxe java7
+        /*switch (data.getKey()) {
             case labelx: x = (Double) data.getValue();
                 break;
             case labely: y = (Double) data.getValue();
                 break;
             case labeld: d = (Double) data.getValue();
                 break;    
-            default: return null; /* erreur :-) */
+            default: return null; // erreur ;)
+        }*/
+        
+        // bidouille pour remplacer les if à répétition ^^
+        switch (PositioningDataAttribute.toAttrType(data.getKey())) {
+            case X: x = (Double) data.getValue();
+                break;
+            case Y: y = (Double) data.getValue();
+                break;
+            case DIRECTION: d = (Double) data.getValue();
+                break;    
+            default: return null; // erreur ;)
         }
+        
         
         if (++stamp == 3) {
             stamp = 0;

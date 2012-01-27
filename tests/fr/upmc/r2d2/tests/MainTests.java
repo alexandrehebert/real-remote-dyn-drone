@@ -57,7 +57,6 @@ public class MainTests extends TestCase {
         Utils.block("Tests", new Utils.Block() {
             
             @Override
-            @SuppressWarnings("UseSpecificCatch")
             public void run() {
 
                 /**

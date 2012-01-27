@@ -228,7 +228,7 @@ public class MainJavassist {
      * qu'elle soit de type Sensor ou Actuator
      */
     public static class RobotMaker implements Makeable {
-
+        
         private StringBuffer tmpQueue = new StringBuffer();
         private Map<CtMethod, Annotation> sensors = new HashMap(), 
                 actuators = new HashMap();
@@ -348,7 +348,7 @@ public class MainJavassist {
         
         public void processAnnotation(CtMethod m, String name, IntegerActuatorData sensor) {
             processGroup(sensor.groupName(), 
-                    String.format(Locale.US, "RealControllerPanel(\"%s\", \"%s\", %f, %f, \"%s\", %d, %d)", 
+                    String.format(Locale.US, "IntegerControllerPanel(\"%s\", \"%s\", %f, %f, \"%s\", %d, %d)", 
                     sensor.groupName(),
                     name, 
                     sensor.minWritingRate(),
@@ -361,7 +361,7 @@ public class MainJavassist {
         
         public void processAnnotation(CtMethod m, String name, BooleanActuatorData sensor) {
             processGroup(sensor.groupName(), 
-                    String.format(Locale.US, "RealControllerPanel(\"%s\", \"%s\", %f, %f)", 
+                    String.format(Locale.US, "BooleanControllerPanel(\"%s\", \"%s\", %f, %f)", 
                     sensor.groupName(),
                     name, 
                     sensor.minWritingRate(),
@@ -387,7 +387,7 @@ public class MainJavassist {
 
             try {
                 process = getClass().getMethod("processAnnotation", CtMethod.class, String.class, a.annotationType());
-            } catch (NoSuchMethodException | SecurityException ex) {
+            } catch (Exception ex) {
                 Utils.log("Il n'existe pas de traitement associé à "+ a.annotationType().getName() +" : "+ ex.getMessage());
                 return;
             } // si on ne trouve pas la méthode tant pis, pas besoin de faire remonter d'exception
@@ -425,7 +425,7 @@ public class MainJavassist {
                 makeSensors();
             //}
             
-            //if (hasActuators()) { on doit créé une queue dans tous les cas, qu'elle soit vide ou non
+            //if (hasActuators()) { on doit créér une queue dans tous les cas, qu'elle soit vide ou non
                 Block.print("\tclass " + robot.getSimpleName() + RECEPTOR_EXT);
                 makeActuators();
             //}

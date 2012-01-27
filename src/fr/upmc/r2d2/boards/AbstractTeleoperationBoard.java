@@ -280,7 +280,7 @@ public abstract class AbstractTeleoperationBoard
                                         }
                                     });
                         }
-                    } catch (InterruptedException | InvocationTargetException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

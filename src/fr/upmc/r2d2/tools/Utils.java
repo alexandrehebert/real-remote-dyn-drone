@@ -88,11 +88,19 @@ public class Utils {
         try {
             InputStream ips = new FileInputStream("snippets/" + name + ".snippet");
             InputStreamReader ipsr = new InputStreamReader(ips);
+            /*
+             * syntaxe java7, dommage...
             try (BufferedReader br = new BufferedReader(ipsr)) {
                 String line = "";
                 // qui a dit qu'on ne pouvait pas lire un fichier en une seule ligne de java ? :D
                 while ((file += line) != null && (line = br.readLine()) != null) {}
             }
+             */
+            BufferedReader br = new BufferedReader(ipsr);
+            String line = "";
+            // qui a dit qu'on ne pouvait pas lire un fichier en une seule ligne de java ? :D
+            while ((file += line) != null && (line = br.readLine()) != null) {}
+            br.close();
         } catch (Exception e) {
             Utils.print(e);
         }
@@ -109,14 +117,15 @@ public class Utils {
     public static String serialize(Object o) {
         final StringBuffer s = new StringBuffer();
         try {
-            try (ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
-                     @Override
-                     public void write(int b) throws IOException {
-                         s.append((char) b);
-                     }
-                 })) {
-                oos.writeObject(o);
-            }
+            ObjectOutputStream oos = new ObjectOutputStream(new OutputStream() {
+
+                @Override
+                public void write(int b) throws IOException {
+                    s.append((char) b);
+                }
+            });
+            oos.writeObject(o);
+            oos.close();
         } catch (Exception e) {
         } finally {
             return s.toString();

@@ -33,7 +33,7 @@ public class AssistantLoader extends Loader {
         super(ClassPool.getDefault());
         try {
             addTranslator(p, new DispatchTranslator());
-        } catch (NotFoundException | CannotCompileException e) {
+        } catch (Exception e) {
             Utils.print(e);
         }
     }

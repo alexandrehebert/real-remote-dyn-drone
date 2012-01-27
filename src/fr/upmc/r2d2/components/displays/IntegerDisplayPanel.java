@@ -4,6 +4,7 @@ import fr.upmc.dtgui.annotations.VariationType;
 
 /**
  * Display associé à un senseur de type entier
+ * On hérite de RealDisplayPanel que l'on restreint au type entier
  * 
  * @author Alexandre Hebert
  * @author Thomas Champion

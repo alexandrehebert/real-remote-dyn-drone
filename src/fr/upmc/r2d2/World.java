@@ -58,7 +58,7 @@ public class World extends Thread {
                             }
                         }
                     });
-        } catch (InterruptedException | InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
